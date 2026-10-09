@@ -1,5 +1,5 @@
-// ==========================================
-// BAYYILDIZ Ayakkabi — Firebase Bulut Senkronizasyonu
+﻿// ==========================================
+// BAYYILDIZ Ayakkabi Ã¢â‚¬â€ Firebase Bulut Senkronizasyonu
 // Firebase Auth ile arka planda sessiz kimlik dogrulama
 // ==========================================
 
@@ -18,7 +18,8 @@ const CloudSync = {
     apiKey: "AIzaSyCn5XmqEuwpaVpbE838MQXUPDbCWohpn0k",
     authDomain: "bayyildiz-stoktakip-4f986.firebaseapp.com",
     databaseURL: "https://bayyildiz-stoktakip-4f986-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "bayyildiz-stoktakip-4f986"
+    projectId: "bayyildiz-stoktakip-4f986",
+    appId: "1:543393820406:web:72825019b98eb2e52946d7"
   },
 
   // Bulut giris bilgisi KAYNAK KODDA TUTULMAZ. Her cihazda bir kez girilir ve
@@ -63,6 +64,15 @@ const CloudSync = {
     try {
       if (typeof firebase !== 'undefined' && !firebase.apps.length) {
         firebase.initializeApp(this.config);
+
+        try {
+          if (typeof firebase.appCheck === 'function') {
+            self.FIREBASE_APPCHECK_DEBUG_TOKEN = location.hostname === 'localhost';
+            const appCheck = firebase.appCheck();
+            appCheck.activate(new firebase.appCheck.ReCaptchaEnterpriseProvider('6Lcx2OEtAAAAAIVLFVvIrpJ4b4FzadcNOXWCI99p'), true);
+            console.log("App Check aktif (Admin Panel)");
+          }
+        } catch(err) { console.error("App check hatasi", err); }
       }
     } catch (e) {
       console.error('Firebase init failed', e);
@@ -168,7 +178,7 @@ const CloudSync = {
       this.updateStatus('syncing', 'Buluta Yaziliyor...');
       this.ignoreNextChange = true;
 
-      // Olası 'undefined' alanların Firebase set() metodunu kırmasını önlemek için güvenli kopya oluştur
+      // OlasÃ„Â± 'undefined' alanlarÃ„Â±n Firebase set() metodunu kÃ„Â±rmasÃ„Â±nÃ„Â± ÃƒÂ¶nlemek iÃƒÂ§in gÃƒÂ¼venli kopya oluÃ…Å¸tur
       const safeData = JSON.parse(JSON.stringify(dataObj));
       // Site ayarlari kendi yolunda (webSettings) yonetilir; stok verisiyle ezilmesin.
       delete safeData.webSettings;
@@ -263,7 +273,7 @@ const CloudSync = {
     });
   },
 
-  // Ayarlar ekranındaki kontrollerle uyumlu olması için mock fonksiyonlar (geri alındığı için)
+  // Ayarlar ekranÃ„Â±ndaki kontrollerle uyumlu olmasÃ„Â± iÃƒÂ§in mock fonksiyonlar (geri alÃ„Â±ndÃ„Â±Ã„Å¸Ã„Â± iÃƒÂ§in)
   hasCredentials() {
     return !!(this.serviceAccount.email && this.serviceAccount.password);
   }

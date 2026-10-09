@@ -1,0 +1,4 @@
+store.data.sales = [];
+store.save();
+alert("Tüm satış geçmişi başarıyla temizlendi ve sayfa sıfırlandı!");
+if (typeof SalesPage !== 'undefined') SalesPage.render();

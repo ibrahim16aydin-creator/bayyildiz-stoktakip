@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bayyildiz-cache-v2';
+const CACHE_NAME = 'bayyildiz-cache-v4';
 const urlsToCache = [
   './',
   './index.html',

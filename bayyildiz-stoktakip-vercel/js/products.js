@@ -462,7 +462,7 @@ const ProductsPage = {
                 if (!imgUrl && p.images && p.images.length > 0) imgUrl = p.images[0];
                 if (Array.isArray(imgUrl)) imgUrl = imgUrl[0];
                 return imgUrl
-                  ? `<img src="${escUrl(imgUrl)}" class="product-thumb" data-id="${esc(p.id)}" alt="${esc(p.model)}" style="cursor:pointer;width:40px;height:40px;object-fit:cover;border-radius:4px;" title="Görseli Büyüt">`
+                  ? `<img src="${escUrl(imgUrl)}" class="product-thumb" data-id="${esc(p.id)}" alt="${esc(p.model)}" onerror="this.outerHTML='<div class=\\'product-thumb-placeholder\\' style=\\'width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.05);border-radius:4px;font-size:20px;\\' title=\\'Görsel Bulunamadı\\'>👟</div>'" style="cursor:pointer;width:40px;height:40px;object-fit:cover;border-radius:4px;" title="Görseli Büyüt">`
                   : `<div class="product-thumb-placeholder" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.05);border-radius:4px;font-size:20px;">👟</div>`;
               })()
             }

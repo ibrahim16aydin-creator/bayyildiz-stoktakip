@@ -125,15 +125,25 @@ function showInstallPrompt(forIOS = false) {
 
 window.openInstallPrompt = () => showInstallPrompt(false);
 
-// Service Worker Kaydı
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(registration => {
-        console.log('ServiceWorker başarıyla kaydedildi:', registration.scope);
-      })
-      .catch(error => {
-        console.log('ServiceWorker kaydı başarısız:', error);
-      });
-  });
+// Manifest & Service Worker Kaydı
+if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+  // Manifest Yükle
+  const manifestLink = document.createElement('link');
+  manifestLink.rel = 'manifest';
+  manifestLink.href = 'manifest.json';
+  document.head.appendChild(manifestLink);
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(registration => {
+          console.log('ServiceWorker başarıyla kaydedildi:', registration.scope);
+        })
+        .catch(error => {
+          console.log('ServiceWorker kaydı başarısız:', error);
+        });
+    });
+  }
+} else {
+  console.log('Uygulama dosya protokolü ile çalıştırıldığından PWA özellikleri (Manifest, ServiceWorker) devre dışı bırakıldı.');
 }

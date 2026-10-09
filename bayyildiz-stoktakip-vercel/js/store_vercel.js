@@ -1,5 +1,5 @@
 ﻿// ==========================================
-// BAYYILDIZ Ayakkabı — Veri Yönetim Katmanı (Store)
+// BAYYILDIZ AyakkabÄ± â€” Veri YÃ¶netim KatmanÄ± (Store)
 // ==========================================
 
 class ShoeStore {
@@ -8,20 +8,20 @@ class ShoeStore {
     this.data = this.loadData();
   }
 
-  // ---- Veri Yükleme / Kaydetme ----
+  // ---- Veri YÃ¼kleme / Kaydetme ----
 
   loadData() {
     try {
       const saved = localStorage.getItem(this.STORAGE_KEY);
       if (saved && saved !== "undefined") {
-        // Yerel kayıt da (bozulma veya dışarıdan yazma ihtimaline karşı)
-        // aynı şema doğrulamasından geçirilir.
+        // Yerel kayÄ±t da (bozulma veya dÄ±ÅŸarÄ±dan yazma ihtimaline karÅŸÄ±)
+        // aynÄ± ÅŸema doÄŸrulamasÄ±ndan geÃ§irilir.
         const result = this.validateDataShape(JSON.parse(saved));
         if (result.ok) return result.data;
-        console.error('Yerel veri şemaya uymadığı için yeniden kuruluyor:', result.message);
+        console.error('Yerel veri ÅŸemaya uymadÄ±ÄŸÄ± iÃ§in yeniden kuruluyor:', result.message);
       }
     } catch (e) {
-      console.error('Veri yükleme hatası:', e);
+      console.error('Veri yÃ¼kleme hatasÄ±:', e);
     }
     const defaultData = this.getDefaultData();
     // this.loadSampleData(defaultData); // <-- RETC VERY KAPATTIK (Sfr sistem iin)
@@ -45,31 +45,31 @@ class ShoeStore {
       branches: [
         {
           id: 'heykel',
-          name: 'Heykel Merkez Şube',
-          address: 'Atatürk Cad. Kurtul Sok. No:4 Osmangazi / Bursa',
+          name: 'Heykel Merkez Åube',
+          address: 'AtatÃ¼rk Cad. Kurtul Sok. No:4 Osmangazi / Bursa',
           phone: '0224 220 82 98',
           color: '#7c3aed'
         },
         {
           id: 'fsm',
-          name: 'FSM Şube',
-          address: 'Fatih Sultan Mehmet Bulvarı No:84 Nilüfer / Bursa',
+          name: 'FSM Åube',
+          address: 'Fatih Sultan Mehmet BulvarÄ± No:84 NilÃ¼fer / Bursa',
           phone: '0552 222 82 98',
           color: '#06b6d4'
         }
       ],
       settings: {
-        companyName: 'BAYYILDIZ Ayakkabı (1989)',
+        companyName: 'BAYYILDIZ AyakkabÄ± (1989)',
         website: 'https://bayyildiz.com',
-        currency: '₺',
+        currency: 'â‚º',
         lowStockThreshold: 3,
         sizes: {
-          'Kadın': [35, 36, 37, 38, 39, 40, 41],
+          'KadÄ±n': [35, 36, 37, 38, 39, 40, 41],
           'Erkek': [39, 40, 41, 42, 43, 44, 45, 46]
         },
-        seasons: ['4 Mevsim', 'Yaz', 'Kış', 'İlkbahar', 'Sonbahar'],
-        categories: ['Günlük', 'Klasik', 'Outdoor', 'Bot'],
-          managers: ['Ahmet', 'Ayşe', 'Mehmet']
+        seasons: ['4 Mevsim', 'Yaz', 'KÄ±ÅŸ', 'Ä°lkbahar', 'Sonbahar'],
+        categories: ['GÃ¼nlÃ¼k', 'Klasik', 'Outdoor', 'Bot'],
+          managers: ['Ahmet', 'AyÅŸe', 'Mehmet']
       }
     };
   }
@@ -78,43 +78,43 @@ class ShoeStore {
     return [
       {
         id: 'sup_bayyildiz',
-        name: 'BAYYILDIZ İmalat & Tedarik Merkezi (Bursa)',
-        contactPerson: 'Üretim & Sevkiyat Sorumlusu',
+        name: 'BAYYILDIZ Ä°malat & Tedarik Merkezi (Bursa)',
+        contactPerson: 'Ãœretim & Sevkiyat Sorumlusu',
         phone: '0224 220 82 98',
         email: 'tedarik@bayyildiz.com',
         city: 'Bursa',
         address: 'Kurtul Sokak No:4 Heykel Osmangazi / Bursa',
-        notes: '1989’dan beri hakiki dana derisi, el yapımı birinci sınıf erkek & kadın ayakkabı imalatı.'
+        notes: '1989â€™dan beri hakiki dana derisi, el yapÄ±mÄ± birinci sÄ±nÄ±f erkek & kadÄ±n ayakkabÄ± imalatÄ±.'
       },
       {
         id: 'sup_deri',
-        name: 'Bursa İhtisas Deri Sanayi A.Ş.',
-        contactPerson: 'Kemal Özkan',
+        name: 'Bursa Ä°htisas Deri Sanayi A.Å.',
+        contactPerson: 'Kemal Ã–zkan',
         phone: '0224 360 40 50',
         email: 'siparis@bursaderi.com.tr',
         city: 'Bursa',
-        address: 'Bursa Deri İhtisas Organize Sanayi Bölgesi',
-        notes: 'Hakiki vidala ve nubuk dana derisi tedarikçisi.'
+        address: 'Bursa Deri Ä°htisas Organize Sanayi BÃ¶lgesi',
+        notes: 'Hakiki vidala ve nubuk dana derisi tedarikÃ§isi.'
       },
       {
         id: 'sup_kosele',
-        name: 'İtalyan & Ege Kösele Deri Sanayi',
-        contactPerson: 'Ahmet Çetinkaya',
+        name: 'Ä°talyan & Ege KÃ¶sele Deri Sanayi',
+        contactPerson: 'Ahmet Ã‡etinkaya',
         phone: '0232 433 10 20',
         email: 'info@egekosele.com',
-        city: 'İzmir',
-        address: 'Işıkkent Ayakkabıcılar Sitesi',
-        notes: 'Özel kösele taban ve klasik ayakkabı taban tedarikçisi.'
+        city: 'Ä°zmir',
+        address: 'IÅŸÄ±kkent AyakkabÄ±cÄ±lar Sitesi',
+        notes: 'Ã–zel kÃ¶sele taban ve klasik ayakkabÄ± taban tedarikÃ§isi.'
       },
       {
         id: 'sup_eva',
         name: 'Anadolu Taban & EVA Teknolojileri',
-        contactPerson: 'Serdar Doğan',
+        contactPerson: 'Serdar DoÄŸan',
         phone: '0212 671 80 90',
         email: 'tedarik@anadolutaban.com',
-        city: 'İstanbul',
-        address: 'İkitelli OSB Aykosan Sanayi Sitesi',
-        notes: 'Hafif ithal EVA taban ve comfort anatomik iç tabanlıklar.'
+        city: 'Ä°stanbul',
+        address: 'Ä°kitelli OSB Aykosan Sanayi Sitesi',
+        notes: 'Hafif ithal EVA taban ve comfort anatomik iÃ§ tabanlÄ±klar.'
       }
     ];
   }
@@ -131,21 +131,21 @@ class ShoeStore {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(dataObj));
       this.createDailyBackup(dataObj);
     } catch (e) {
-      console.error('Veri kaydedilirken hata oluştu:', e);
+      console.error('Veri kaydedilirken hata oluÅŸtu:', e);
     }
   }
 
-  // ---- Gelen Veri Doğrulama ----
+  // ---- Gelen Veri DoÄŸrulama ----
   //
-  // Yedek dosyaları ve buluttan gelen veriler güvenilmeyen kaynaklardır.
-  // Doğrulanmadan uygulanan bir yapı, hem uygulamayı bozabilir hem de
-  // prototip kirletme yoluyla kod akışını etkileyebilir.
+  // Yedek dosyalarÄ± ve buluttan gelen veriler gÃ¼venilmeyen kaynaklardÄ±r.
+  // DoÄŸrulanmadan uygulanan bir yapÄ±, hem uygulamayÄ± bozabilir hem de
+  // prototip kirletme yoluyla kod akÄ±ÅŸÄ±nÄ± etkileyebilir.
 
   static get DANGEROUS_KEYS() {
     return ['__proto__', 'constructor', 'prototype'];
   }
 
-  /** Nesne anahtarlarını özyinelemeli tarayıp riskli olanları ayıklar */
+  /** Nesne anahtarlarÄ±nÄ± Ã¶zyinelemeli tarayÄ±p riskli olanlarÄ± ayÄ±klar */
   _stripDangerousKeys(value, depth = 0) {
     if (depth > 12) return null;
     if (Array.isArray(value)) {
@@ -163,22 +163,22 @@ class ShoeStore {
   }
 
   /**
-   * Veri yapısının beklenen şemaya uygunluğunu denetler.
-   * Sonuç: { ok: boolean, message?: string, data?: object }
+   * Veri yapÄ±sÄ±nÄ±n beklenen ÅŸemaya uygunluÄŸunu denetler.
+   * SonuÃ§: { ok: boolean, message?: string, data?: object }
    */
   validateDataShape(input) {
     if (!input || typeof input !== 'object' || Array.isArray(input)) {
-      return { ok: false, message: 'Veri yapısı tanınmıyor (nesne bekleniyordu).' };
+      return { ok: false, message: 'Veri yapÄ±sÄ± tanÄ±nmÄ±yor (nesne bekleniyordu).' };
     }
 
     const data = this._stripDangerousKeys(input);
 
     if (!data.settings || typeof data.settings !== 'object' || Array.isArray(data.settings)) {
-      return { ok: false, message: 'Ayarlar bölümü eksik veya geçersiz.' };
+      return { ok: false, message: 'Ayarlar bÃ¶lÃ¼mÃ¼ eksik veya geÃ§ersiz.' };
     }
     
-    // Eski sürümlerde ayarlara kaydedilmiş gizli anahtar herkese açık okunabilen bir yola
-    // senkronize oluyordu; artık hiçbir yerde tutulmaz (yerelden ve buluttan temizlenir).
+    // Eski sÃ¼rÃ¼mlerde ayarlara kaydedilmiÅŸ gizli anahtar herkese aÃ§Ä±k okunabilen bir yola
+    // senkronize oluyordu; artÄ±k hiÃ§bir yerde tutulmaz (yerelden ve buluttan temizlenir).
     delete data.settings.apiToken;
 
     if (data.branches && !Array.isArray(data.branches) && typeof data.branches === 'object') {
@@ -186,16 +186,16 @@ class ShoeStore {
     }
     
     if (!Array.isArray(data.branches) || data.branches.length === 0) {
-      return { ok: false, message: 'Şube listesi eksik veya geçersiz.' };
+      return { ok: false, message: 'Åube listesi eksik veya geÃ§ersiz.' };
     }
     if (data.stock === undefined || data.stock === null) {
       data.stock = {};
     } else if (typeof data.stock !== 'object' || Array.isArray(data.stock)) {
-      return { ok: false, message: 'Stok bölümü eksik veya geçersiz.' };
+      return { ok: false, message: 'Stok bÃ¶lÃ¼mÃ¼ eksik veya geÃ§ersiz.' };
     }
 
-    // Dizi olması gereken bölümler; Firebase boş dizileri sildiği için
-    // eksik olanlar boş dizi kabul edilir, yanlış tipte olanlar nesne ise diziye çevrilir
+    // Dizi olmasÄ± gereken bÃ¶lÃ¼mler; Firebase boÅŸ dizileri sildiÄŸi iÃ§in
+    // eksik olanlar boÅŸ dizi kabul edilir, yanlÄ±ÅŸ tipte olanlar nesne ise diziye Ã§evrilir
     const arrayFields = ['products', 'customers', 'repairs', 'sales',
                          'transfers', 'activities', 'returns', 'losses', 'expenses', 'suppliers', 'reviews'];
     for (const field of arrayFields) {
@@ -207,12 +207,12 @@ class ShoeStore {
         if (typeof data[field] === 'object') {
           data[field] = Object.values(data[field]);
         } else {
-          return { ok: false, message: `"${field}" bölümü liste biçiminde olmalıdır.` };
+          return { ok: false, message: `"${field}" bÃ¶lÃ¼mÃ¼ liste biÃ§iminde olmalÄ±dÄ±r.` };
         }
       }
     }
 
-    // Kimliği olmayan kayıtlar arayüzü bozduğu için ayıklanır (Web entegrasyonu için ID düzeltmesi)
+    // KimliÄŸi olmayan kayÄ±tlar arayÃ¼zÃ¼ bozduÄŸu iÃ§in ayÄ±klanÄ±r (Web entegrasyonu iÃ§in ID dÃ¼zeltmesi)
     for (const field of arrayFields) {
       data[field] = data[field].filter(item => item && typeof item === 'object' && !Array.isArray(item)).map(item => {
         if (item.id === undefined || item.id === null || String(item.id).trim() === '') {
@@ -223,18 +223,18 @@ class ShoeStore {
       });
     }
     data.products = data.products.filter(p => typeof p.id === 'string' && p.id.length > 0);
-    // İsimsiz kaydedilmiş boş müşterileri temizle
+    // Ä°simsiz kaydedilmiÅŸ boÅŸ mÃ¼ÅŸterileri temizle
     data.customers = data.customers.filter(c => c.name && String(c.name).trim() !== '');
     data.branches = data.branches.filter(b => b && typeof b === 'object' && typeof b.id === 'string');
     if (data.branches.length === 0) {
-      return { ok: false, message: 'Geçerli şube kaydı bulunamadı.' };
+      return { ok: false, message: 'GeÃ§erli ÅŸube kaydÄ± bulunamadÄ±.' };
     }
 
     if (!Array.isArray(data.settings.seasons)) {
       if (typeof data.settings.seasons === 'object' && data.settings.seasons !== null) {
         data.settings.seasons = Object.values(data.settings.seasons);
       } else {
-        data.settings.seasons = ['4 Mevsim', 'Yaz', 'Kış', 'İlkbahar', 'Sonbahar'];
+        data.settings.seasons = ['4 Mevsim', 'Yaz', 'KÄ±ÅŸ', 'Ä°lkbahar', 'Sonbahar'];
       }
     }
     if (!data.settings.sizes || typeof data.settings.sizes !== 'object' || Array.isArray(data.settings.sizes)) {
@@ -246,8 +246,8 @@ class ShoeStore {
         }
       }
     }
-    // Kullanıcının isteği üzerine kategoriler sabitlendi
-    data.settings.categories = ['Günlük', 'Klasik', 'Outdoor', 'Bot'];
+    // KullanÄ±cÄ±nÄ±n isteÄŸi Ã¼zerine kategoriler sabitlendi
+    data.settings.categories = ['GÃ¼nlÃ¼k', 'Klasik', 'Outdoor', 'Bot'];
 
     if (data.suppliers.length === 0) {
       data.suppliers = this.getDefaultSuppliers();
@@ -257,14 +257,14 @@ class ShoeStore {
   }
 
   applyCloudData(cloudData) {
-    // Buluttan gelen veri güvenilmeyen kaynak sayılır ve şemaya göre doğrulanır.
+    // Buluttan gelen veri gÃ¼venilmeyen kaynak sayÄ±lÄ±r ve ÅŸemaya gÃ¶re doÄŸrulanÄ±r.
     const result = this.validateDataShape(cloudData);
     if (!result.ok) {
       console.error('Buluttan gelen veri reddedildi:', result.message);
       return false;
     }
 
-    // Site ayarları (webSettings) kendi yolunda yönetilir; stok verisine karıştırılmaz
+    // Site ayarlarÄ± (webSettings) kendi yolunda yÃ¶netilir; stok verisine karÄ±ÅŸtÄ±rÄ±lmaz
     delete result.data.webSettings;
     this.data = result.data;
     this.saveData(this.data);
@@ -275,7 +275,7 @@ class ShoeStore {
     return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
   }
 
-  // ---- Müşteri İşlemleri ----
+  // ---- MÃ¼ÅŸteri Ä°ÅŸlemleri ----
 
   addCustomerPoints(customerId, points) {
     const customer = this.getCustomer(customerId);
@@ -323,24 +323,24 @@ class ShoeStore {
       updatedAt: new Date().toISOString()
     };
     this.data.customers.push(newCustomer);
-    this.addActivity('info', `Yeni müşteri eklendi: ${newCustomer.name}`);
+    this.addActivity('info', `Yeni mÃ¼ÅŸteri eklendi: ${newCustomer.name}`);
     this.save();
     return newCustomer;
   }
 
   addCustomerPayment(customerId, amount, method, description) {
     const customer = this.getCustomer(customerId);
-    if (!customer) return { success: false, message: 'Müşteri bulunamadı.' };
+    if (!customer) return { success: false, message: 'MÃ¼ÅŸteri bulunamadÄ±.' };
 
     if (typeof customer.balance !== 'number') customer.balance = 0;
     if (!customer.payments) customer.payments = [];
 
     const paymentAmount = parseFloat(amount);
     if (isNaN(paymentAmount) || paymentAmount <= 0) {
-      return { success: false, message: 'Geçersiz tutar.' };
+      return { success: false, message: 'GeÃ§ersiz tutar.' };
     }
 
-    customer.balance -= paymentAmount; // Borçtan düş
+    customer.balance -= paymentAmount; // BorÃ§tan dÃ¼ÅŸ
     
     const paymentRecord = {
       id: this.generateId(),
@@ -352,7 +352,7 @@ class ShoeStore {
     };
     customer.payments.push(paymentRecord);
     
-    this.addActivity('success', `${customer.name} adlı müşteriden ${this.formatCurrency(paymentAmount)} tahsilat yapıldı.`);
+    this.addActivity('success', `${customer.name} adlÄ± mÃ¼ÅŸteriden ${this.formatCurrency(paymentAmount)} tahsilat yapÄ±ldÄ±.`);
     this.save();
     
     return { success: true, payment: paymentRecord };
@@ -364,7 +364,7 @@ class ShoeStore {
     if (index === -1) return null;
 
     if (updates.name !== undefined && (!updates.name || !String(updates.name).trim())) {
-      return null; // İsmi boşaltmayı engelle
+      return null; // Ä°smi boÅŸaltmayÄ± engelle
     }
 
     this.data.customers[index] = {
@@ -373,7 +373,7 @@ class ShoeStore {
       updatedAt: new Date().toISOString()
     };
 
-    this.addActivity('info', `Müşteri bilgileri güncellendi: ${this.data.customers[index].name}`);
+    this.addActivity('info', `MÃ¼ÅŸteri bilgileri gÃ¼ncellendi: ${this.data.customers[index].name}`);
     this.save();
     return this.data.customers[index];
   }
@@ -384,18 +384,18 @@ class ShoeStore {
     if (!cust) return false;
 
     this.data.customers = this.data.customers.filter(x => String(x.id) !== String(id));
-    this.addActivity('info', `Müşteri silindi: ${cust.name}`);
+    this.addActivity('info', `MÃ¼ÅŸteri silindi: ${cust.name}`);
     this.save();
     return true;
   }
 
   clearAllCustomers() {
     this.data.customers = [];
-    this.addActivity('warning', 'Tüm müşteriler sistemden temizlendi.');
+    this.addActivity('warning', 'TÃ¼m mÃ¼ÅŸteriler sistemden temizlendi.');
     this.save();
   }
 
-  // ---- Tamirat İşlemleri ----
+  // ---- Tamirat Ä°ÅŸlemleri ----
 
   getRepairs(customerId = null) {
     const repairs = this.data.repairs || [];
@@ -418,7 +418,7 @@ class ShoeStore {
       dateReturned: repair.status === 'Teslim Edildi' ? new Date().toISOString() : null
     };
     this.data.repairs.push(newRepair);
-    this.addActivity('info', `Yeni tamirat kaydı oluşturuldu: ${newRepair.productName}`);
+    this.addActivity('info', `Yeni tamirat kaydÄ± oluÅŸturuldu: ${newRepair.productName}`);
     this.save();
     return newRepair;
   }
@@ -436,7 +436,7 @@ class ShoeStore {
       repair.dateReturned = null;
     }
 
-    this.addActivity('info', `Tamirat durumu güncellendi: ${repair.productName} -> ${status}`);
+    this.addActivity('info', `Tamirat durumu gÃ¼ncellendi: ${repair.productName} -> ${status}`);
     this.save();
     return repair;
   }
@@ -448,7 +448,7 @@ class ShoeStore {
     return true;
   }
 
-  // ---- Firma (Tedarikçi) İşlemleri ----
+  // ---- Firma (TedarikÃ§i) Ä°ÅŸlemleri ----
 
   getSuppliers() {
     return this.data.suppliers || [];
@@ -462,7 +462,7 @@ class ShoeStore {
     if (!this.data.suppliers) this.data.suppliers = [];
     const newSupplier = {
       id: this.generateId(),
-      name: supplier.name || 'İsimsiz Firma',
+      name: supplier.name || 'Ä°simsiz Firma',
       contactPerson: supplier.contactPerson || '',
       phone: supplier.phone || '',
       email: supplier.email || '',
@@ -473,7 +473,7 @@ class ShoeStore {
       updatedAt: new Date().toISOString()
     };
     this.data.suppliers.push(newSupplier);
-    this.addActivity('info', `Yeni tedarikçi firma eklendi: ${newSupplier.name}`);
+    this.addActivity('info', `Yeni tedarikÃ§i firma eklendi: ${newSupplier.name}`);
     this.save();
     return newSupplier;
   }
@@ -489,7 +489,7 @@ class ShoeStore {
       updatedAt: new Date().toISOString()
     };
 
-    this.addActivity('info', `Firma bilgileri güncellendi: ${this.data.suppliers[index].name}`);
+    this.addActivity('info', `Firma bilgileri gÃ¼ncellendi: ${this.data.suppliers[index].name}`);
     this.save();
     return this.data.suppliers[index];
   }
@@ -531,12 +531,12 @@ class ShoeStore {
     };
   }
 
-  // ---- Çok Satanlar (Geçmiş Satışları Hesapla) ----
+  // ---- Ã‡ok Satanlar (GeÃ§miÅŸ SatÄ±ÅŸlarÄ± Hesapla) ----
   calculateHistoricalSalesCount() {
     let changed = false;
     this.data.products.forEach(p => {
         let count = 0;
-        this.getSales().forEach(s => {
+        this.data.sales.forEach(s => {
             if (s.productId === p.id && (s.status === 'completed' || s.status === 'completed_cash' || s.status === 'completed_card' || !s.status)) {
                 count += parseInt(s.quantity) || 1;
             }
@@ -554,7 +554,7 @@ class ShoeStore {
     }
   }
 
-  // ---- Ürün İşlemleri ----
+  // ---- ÃœrÃ¼n Ä°ÅŸlemleri ----
 
   getProducts() {
     return this.data.products;
@@ -575,7 +575,7 @@ class ShoeStore {
     const colorStr = (product.color || '').trim();
     let calculatedStockCode = (product.stockCode || '').trim();
     
-    // Eğer hem model hem de renk girilmişse stok kodunu otomatik birleştir
+    // EÄŸer hem model hem de renk girilmiÅŸse stok kodunu otomatik birleÅŸtir
     if (modelStr && colorStr) {
         calculatedStockCode = `${modelStr}-${colorStr}`;
     }
@@ -609,7 +609,7 @@ class ShoeStore {
       });
     });
 
-    this.addActivity('product_add', `Yeni ürün eklendi: ${newProduct.brand} ${newProduct.model}`);
+    this.addActivity('product_add', `Yeni Ã¼rÃ¼n eklendi: ${newProduct.brand} ${newProduct.model}`);
     this.save();
     return newProduct;
   }
@@ -620,7 +620,7 @@ class ShoeStore {
 
     const oldGender = this.data.products[index].gender;
     
-    // Uygulanacak güncellemeleri hesapla
+    // Uygulanacak gÃ¼ncellemeleri hesapla
     let updatedProduct = {
       ...this.data.products[index],
       ...updates,
@@ -647,7 +647,7 @@ class ShoeStore {
       });
     }
 
-    this.addActivity('product_update', `Ürün güncellendi: ${this.data.products[index].brand} ${this.data.products[index].model}`);
+    this.addActivity('product_update', `ÃœrÃ¼n gÃ¼ncellendi: ${this.data.products[index].brand} ${this.data.products[index].model}`);
     this.save();
     return this.data.products[index];
   }
@@ -656,10 +656,10 @@ class ShoeStore {
     const product = this.getProduct(id);
     if (!product) return false;
 
-    // Yumuşak silme: ürünü işaretle, arayüzde gizle ama geçmiş satış/transfer kayıtlarını koru
+    // YumuÅŸak silme: Ã¼rÃ¼nÃ¼ iÅŸaretle, arayÃ¼zde gizle ama geÃ§miÅŸ satÄ±ÅŸ/transfer kayÄ±tlarÄ±nÄ± koru
     product.deletedAt = new Date().toISOString();
     delete this.data.stock[id];
-    this.addActivity('product_delete', `Ürün silindi: ${product.brand} ${product.model}`);
+    this.addActivity('product_delete', `ÃœrÃ¼n silindi: ${product.brand} ${product.model}`);
     this.save();
     return true;
   }
@@ -669,7 +669,7 @@ class ShoeStore {
     const idSet = new Set(productIds);
     let count = 0;
 
-    // Yumuşak silme: ürünleri işaretle, stokları temizle ama satış/transfer geçmişini koru
+    // YumuÅŸak silme: Ã¼rÃ¼nleri iÅŸaretle, stoklarÄ± temizle ama satÄ±ÅŸ/transfer geÃ§miÅŸini koru
     this.data.products.forEach(p => {
       if (idSet.has(p.id) && !p.deletedAt) {
         p.deletedAt = new Date().toISOString();
@@ -680,7 +680,7 @@ class ShoeStore {
       delete this.data.stock[id];
     });
 
-    this.addActivity('product_delete', `${count} adet ürün toplu olarak silindi`);
+    this.addActivity('product_delete', `${count} adet Ã¼rÃ¼n toplu olarak silindi`);
     this.save();
     return count;
   }
@@ -694,7 +694,7 @@ class ShoeStore {
       if (!idSet.has(p.id)) return;
       updatedCount++;
 
-      // Fiyat güncellemesi
+      // Fiyat gÃ¼ncellemesi
       if (updates.priceMode && updates.priceValue !== undefined && updates.priceValue !== null && updates.priceValue !== '') {
         const val = parseFloat(updates.priceValue);
         if (!isNaN(val)) {
@@ -712,7 +712,7 @@ class ShoeStore {
         }
       }
 
-      // Maliyet fiyatı güncellemesi
+      // Maliyet fiyatÄ± gÃ¼ncellemesi
       if (updates.costPriceMode && updates.costPriceValue !== undefined && updates.costPriceValue !== null && updates.costPriceValue !== '') {
         const val = parseFloat(updates.costPriceValue);
         if (!isNaN(val)) {
@@ -730,22 +730,22 @@ class ShoeStore {
         }
       }
 
-      // Kategori güncellemesi
+      // Kategori gÃ¼ncellemesi
       if (updates.category && updates.category !== '__keep__') {
         p.category = updates.category;
       }
       
-      // Sezon güncellemesi
+      // Sezon gÃ¼ncellemesi
       if (updates.season && updates.season !== '__keep__') {
         p.season = updates.season;
       }
 
-      // Tedarikçi güncellemesi
+      // TedarikÃ§i gÃ¼ncellemesi
       if (updates.supplierId && updates.supplierId !== '__keep__') {
         p.supplierId = updates.supplierId === '__none__' ? '' : updates.supplierId;
       }
 
-      // Cinsiyet güncellemesi
+      // Cinsiyet gÃ¼ncellemesi
       if (updates.gender && updates.gender !== '__keep__' && updates.gender !== p.gender) {
         p.gender = updates.gender;
         const newSizes = this.data.settings.sizes[updates.gender] || [];
@@ -761,7 +761,7 @@ class ShoeStore {
       p.updatedAt = new Date().toISOString();
     });
 
-    this.addActivity('product_update', `${updatedCount} adet ürün toplu güncellendi`);
+    this.addActivity('product_update', `${updatedCount} adet Ã¼rÃ¼n toplu gÃ¼ncellendi`);
     this.save();
     return updatedCount;
   }
@@ -779,14 +779,14 @@ class ShoeStore {
       );
     }
 
-    if (filters.gender && filters.gender !== 'Tümü') results = results.filter(p => p.gender === filters.gender);
+    if (filters.gender && filters.gender !== 'TÃ¼mÃ¼') results = results.filter(p => p.gender === filters.gender);
     if (filters.category && filters.category !== 'all') results = results.filter(p => p.category === filters.category);
     if (filters.season && filters.season !== 'all') results = results.filter(p => p.season === filters.season);
-    if (filters.brand && filters.brand !== 'Tümü') results = results.filter(p => p.brand === filters.brand);
-    if (filters.supplierId && filters.supplierId !== 'Tümü') results = results.filter(p => p.supplierId === filters.supplierId);
+    if (filters.brand && filters.brand !== 'TÃ¼mÃ¼') results = results.filter(p => p.brand === filters.brand);
+    if (filters.supplierId && filters.supplierId !== 'TÃ¼mÃ¼') results = results.filter(p => p.supplierId === filters.supplierId);
 
     // Stok Durumu Filtresi
-    if (filters.stockStatus && filters.stockStatus !== 'Tümü') {
+    if (filters.stockStatus && filters.stockStatus !== 'TÃ¼mÃ¼') {
       results = results.filter(p => {
         const total = this.getProductTotalStock(p.id);
         if (filters.stockStatus === 'in_stock') return total > 0;
@@ -796,7 +796,7 @@ class ShoeStore {
       });
     }
 
-    // Sıralama
+    // SÄ±ralama
     if (sort === 'price_asc') {
       results.sort((a, b) => a.price - b.price);
     } else if (sort === 'price_desc') {
@@ -818,7 +818,7 @@ class ShoeStore {
     return [...new Set(this.data.products.map(p => p.brand))].filter(Boolean).sort();
   }
 
-  // ---- Stok İşlemleri ----
+  // ---- Stok Ä°ÅŸlemleri ----
 
   getStock(productId, branchId) {
     return this.data.stock[productId]?.[branchId] || {};
@@ -854,7 +854,7 @@ class ShoeStore {
     const product = this.getProduct(productId);
     const branch = this.getBranch(branchId);
     if (product && branch) {
-      this.addActivity('stock_in', `Stok girişi: ${product.brand} ${product.model} - ${size} numara, ${quantity} adet (${branch.name})`);
+      this.addActivity('stock_in', `Stok giriÅŸi: ${product.brand} ${product.model} - ${size} numara, ${quantity} adet (${branch.name})`);
     }
     this.save();
   }
@@ -864,13 +864,13 @@ class ShoeStore {
     this._setStock(productId, branchId, size, Math.max(0, current - quantity));
 
     const product = this.getProduct(productId);
-    // Stok bitme uyar�s�
+    // Stok bitme uyarısı
     if (Math.max(0, current - quantity) === 0 && typeof App !== 'undefined' && App.toast) {
-        setTimeout(() => App.toast('DİKKAT: ' + (product ? product.brand + ' ' + product.model : 'Ürün') + ' (' + size + ' Numara) stokları tükendi!', 'warning'), 500);
+        setTimeout(() => App.toast(DİKKAT:  ( Numara) stokları tükendi!, 'warning'), 500);
     }
     const branch = this.getBranch(branchId);
     if (product && branch) {
-      this.addActivity('stock_out', `Stok çıkışı: ${product.brand} ${product.model} - ${size} numara, ${quantity} adet (${branch.name})`);
+      this.addActivity('stock_out', `Stok Ã§Ä±kÄ±ÅŸÄ±: ${product.brand} ${product.model} - ${size} numara, ${quantity} adet (${branch.name})`);
     }
     this.save();
   }
@@ -894,8 +894,8 @@ class ShoeStore {
   getOutOfStockItems() {
     const items = [];
     this.data.products.filter(p => !p.deletedAt).forEach(product => {
-      // Eğer ürünün toplam stoğu > 0 ise, sıfır olan bedenlerini "Tükendi" olarak göster
-      // Hiç stoğu yoksa hepsini listelemek anlamsızdır.
+      // EÄŸer Ã¼rÃ¼nÃ¼n toplam stoÄŸu > 0 ise, sÄ±fÄ±r olan bedenlerini "TÃ¼kendi" olarak gÃ¶ster
+      // HiÃ§ stoÄŸu yoksa hepsini listelemek anlamsÄ±zdÄ±r.
       const totalStock = this.getProductTotalStock(product.id);
       
       this.data.branches.forEach(branch => {
@@ -931,7 +931,7 @@ class ShoeStore {
     return totalValue;
   }
 
-  // ---- Şube İşlemleri ----
+  // ---- Åube Ä°ÅŸlemleri ----
 
   getBranches() {
     return this.data.branches;
@@ -941,7 +941,7 @@ class ShoeStore {
     return this.data.branches.find(x => String(x.id) === String(id));
   }
 
-  // ---- Transfer İşlemleri ----
+  // ---- Transfer Ä°ÅŸlemleri ----
 
   getTransfers() {
     return [...this.data.transfers].reverse();
@@ -950,7 +950,7 @@ class ShoeStore {
   createTransfer(fromBranch, toBranch, productId, size, quantity) {
     const currentFrom = this.data.stock[productId]?.[fromBranch]?.[size] || 0;
     if (currentFrom < quantity) {
-      return { success: false, message: 'Kaynak şubede yeterli stok yok!' };
+      return { success: false, message: 'Kaynak ÅŸubede yeterli stok yok!' };
     }
 
     const currentTo = this.data.stock[productId]?.[toBranch]?.[size] || 0;
@@ -971,38 +971,24 @@ class ShoeStore {
     const product = this.getProduct(productId);
     const from = this.getBranch(fromBranch);
     const to = this.getBranch(toBranch);
-    this.addActivity('transfer', `Transfer: ${product.brand} ${product.model} ${size} no, ${quantity} adet — ${from.name} → ${to.name}`);
+    this.addActivity('transfer', `Transfer: ${product.brand} ${product.model} ${size} no, ${quantity} adet â€” ${from.name} â†’ ${to.name}`);
     this.save();
     return { success: true, transfer };
   }
 
-  // ---- Satış İşlemleri ----
+  // ---- SatÄ±ÅŸ Ä°ÅŸlemleri ----
 
   getSales() {
-    const returns = this.data.returns || [];
-    const netSales = (this.data.sales || []).map(sale => {
-      const retQty = returns.filter(r => r.saleId === sale.id).reduce((sum, r) => sum + r.quantity, 0);
-      if (retQty > 0) {
-        const remaining = sale.quantity - retQty;
-        return {
-          ...sale,
-          originalQuantity: sale.quantity,
-          quantity: remaining,
-          totalPrice: sale.unitPrice * remaining
-        };
-      }
-      return sale;
-    }).filter(sale => sale.quantity > 0);
-    return netSales.reverse();
+    return [...this.data.sales].reverse();
   }
 
   addSale(productId, branchId, size, quantity, unitPrice = null, customerId = null, paymentMethod = 'Nakit', discount = 0, sellerName = '') {
     const product = this.getProduct(productId);
-    if (!product) return { success: false, message: 'Ürün bulunamadı!' };
+    if (!product) return { success: false, message: 'ÃœrÃ¼n bulunamadÄ±!' };
 
     const currentStock = this.data.stock[productId]?.[branchId]?.[size] || 0;
     if (currentStock < quantity) {
-      return { success: false, message: 'Bu şubede yeterli stok yok!' };
+      return { success: false, message: 'Bu ÅŸubede yeterli stok yok!' };
     }
 
     const price = unitPrice !== null ? parseFloat(unitPrice) : product.price;
@@ -1030,7 +1016,7 @@ class ShoeStore {
     };
     this.data.sales.push(sale);
 
-    // Satış sayısını ürüne işle (Çok Satanlar için)
+    // SatÄ±ÅŸ sayÄ±sÄ±nÄ± Ã¼rÃ¼ne iÅŸle (Ã‡ok Satanlar iÃ§in)
     if (typeof product.salesCount !== 'number') product.salesCount = 0;
     product.salesCount += parseInt(quantity);
     if (window.cloud && typeof window.cloud.saveProducts === 'function') {
@@ -1050,132 +1036,26 @@ class ShoeStore {
           amount: sale.totalPrice,
           saleId: sale.id,
           date: new Date().toISOString(),
-          description: `${product.brand} ${product.model} satışı (${sale.quantity} adet)`
+          description: `${product.brand} ${product.model} satÄ±ÅŸÄ± (${sale.quantity} adet)`
         });
       }
     }
 
     this._setStock(productId, branchId, size, currentStock - quantity);
 
-      // Stok bitme uyarısı
-      if (Math.max(0, currentStock - quantity) === 0 && typeof App !== 'undefined' && App.toast) {
-          setTimeout(() => App.toast('DİKKAT: ' + (product ? product.brand + ' ' + product.model : 'Ürün') + ' (' + size + ' Numara) stokları tükendi!', 'warning'), 500);
-      }
+    const product = this.getProduct(productId);
+    // Stok bitme uyarısı
+    if (Math.max(0, current - quantity) === 0 && typeof App !== 'undefined' && App.toast) {
+        setTimeout(() => App.toast(DİKKAT:  ( Numara) stokları tükendi!, 'warning'), 500);
+    }
+    if (!product) return { success: false, message: 'ÃœrÃ¼n bulunamadÄ±!' };
 
-      const branch = this.getBranch(branchId);
-      this.addActivity('sale', `Satış: ${product.brand} ${product.model} ${size} no, ${quantity} adet — ${branch ? branch.name : ''} (${this.formatCurrency(sale.totalPrice)})`);
-      this.save();
-      return { success: true, sale };
+    const currentStock = this.data.stock[productId]?.[branchId]?.[size] || 0;
+    if (currentStock < quantity) {
+      return { success: false, message: 'Bu ÅŸubede yeterli stok yok!' };
     }
 
-    getSalesByBranch(branchId) { return this.getSales().filter(s => s.branchId === branchId); }
-
-    getTodaySales() {
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
-    return this.getSales().filter(s => new Date(s.date) >= start);
-  }
-
-    getTotalSalesAmount(branchId = null) {
-    let sales = this.getSales();
-    if (branchId && branchId !== 'all') {
-      sales = sales.filter(s => s.branchId === branchId);
-    }
-    return sales.reduce((sum, s) => sum + s.totalPrice, 0);
-  }
-
-    getSalesByDateRange(startDate, endDate) {
-    const start = new Date(startDate);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(endDate);
-    end.setHours(23, 59, 59, 999);
-    return this.getSales().filter(s => {
-      const d = new Date(s.date);
-      return d >= start && d <= end;
-    });
-  }
-
-    deleteSale(id) {
-      const index = this.data.sales.findIndex(s => String(s.id) === String(id));
-      if (index === -1) return false;
-      const sale = this.data.sales[index];
-      this.data.sales.splice(index, 1);
-      this.addStock(sale.productId, sale.branchId, sale.size, sale.quantity);
-      if (sale.paymentMethod === 'Veresiye' && sale.customerId) {
-          const customer = this.getCustomer(sale.customerId);
-          if (customer) customer.balance = (customer.balance || 0) - sale.totalPrice;
-      }
-      this.addActivity('warning', `Satış silindi: ${sale.id}`);
-      this.save();
-      return true;
-    }
-
-    getReturns(branchId = null) {
-      let returns = this.data.returns || [];
-      if (branchId) {
-        returns = returns.filter(r => r.branchId === branchId);
-      }
-      return [...returns].reverse();
-    }
-
-    addReturn(saleId, returnQuantity, reason) {
-      const sale = this.data.sales.find(s => String(s.id) === String(saleId));
-      if (!sale) return { success: false, message: 'Satış bulunamadı!' };
-
-      if (returnQuantity > sale.quantity) {
-        return { success: false, message: 'İade miktarı satış miktarından fazla olamaz!' };
-      }
-
-      this.addStock(sale.productId, sale.branchId, sale.size, returnQuantity);
-
-      if (sale.paymentMethod === 'Veresiye' && sale.customerId) {
-        const customer = this.getCustomer(sale.customerId);
-        if (customer) {
-          customer.balance = (customer.balance || 0) - (sale.unitPrice * returnQuantity);
-        }
-      }
-
-      if (!this.data.returns) this.data.returns = [];
-      
-      const totalRefund = sale.unitPrice * returnQuantity;
-      const returnRecord = {
-        id: this.generateId(),
-        saleId: sale.id,
-        productId: sale.productId,
-        branchId: sale.branchId,
-        size: sale.size,
-        quantity: parseInt(returnQuantity),
-        reason: reason || 'Belirtilmedi',
-        unitPrice: sale.unitPrice,
-        totalRefund: totalRefund,
-        date: new Date().toISOString()
-      };
-      this.data.returns.push(returnRecord);
-
-      const product = this.getProduct(sale.productId);
-      const branch = this.getBranch(sale.branchId);
-      this.addActivity('return', `İade: ${product ? product.brand + ' ' + product.model : ''} ${sale.size} no, ${returnQuantity} adet — ${branch ? branch.name : ''} (${this.formatCurrency(totalRefund)})`);
-      
-      this.save();
-      return { success: true, return: returnRecord };
-    }
-
-    getLosses() {
-      return [...(this.data.losses || [])].reverse();
-    }
-
-    addLoss(productId, branchId, size, quantity, reason = 'Kayıp', description = '') {
-      const product = this.getProduct(productId);
-      if (!product) return { success: false, message: 'Ürün bulunamadı!' };
-
-      const currentStock = this.data.stock[productId]?.[branchId]?.[size] || 0;
-      if (currentStock < quantity) {
-        return { success: false, message: 'Bu şubede yeterli stok yok!' };
-      }
-
-      this._setStock(productId, branchId, size, currentStock - quantity);
-      
-      const loss = {
+    const loss = {
       id: this.generateId(),
       productId,
       branchId,
@@ -1195,9 +1075,9 @@ class ShoeStore {
 
     this.addActivity('error', `${product.brand} ${product.model} (${size} no) - ${quantity} adet zayiat/fire (${reason}) olarak kaydedildi.`);
     this.save();
-    return { success: true, message: 'Zayiat/Fire başarıyla kaydedildi.' };
+    return { success: true, message: 'Zayiat/Fire baÅŸarÄ±yla kaydedildi.' };
   }
-  // ---- Gider İşlemleri ----
+  // ---- Gider Ä°ÅŸlemleri ----
   
   getExpenses() {
     return this.data.expenses || [];
@@ -1209,14 +1089,14 @@ class ShoeStore {
     const newExpense = {
       id: this.generateId(),
       branchId: expense.branchId,
-      category: expense.category || 'Diğer',
+      category: expense.category || 'DiÄŸer',
       amount: parseFloat(expense.amount) || 0,
       description: expense.description || '',
       date: new Date().toISOString()
     };
     
     this.data.expenses.unshift(newExpense);
-    this.addActivity('warning', `${newExpense.category} kategorisinde ${this.formatCurrency(newExpense.amount)} masraf işlendi.`);
+    this.addActivity('warning', `${newExpense.category} kategorisinde ${this.formatCurrency(newExpense.amount)} masraf iÅŸlendi.`);
     this.save();
     return newExpense;
   }
@@ -1236,14 +1116,14 @@ class ShoeStore {
 
   addReturn(saleId, returnQuantity, reason) {
     const sale = this.data.sales.find(s => s.id === saleId);
-    if (!sale) return { success: false, message: 'Satış bulunamadı!' };
+    if (!sale) return { success: false, message: 'SatÄ±ÅŸ bulunamadÄ±!' };
     
     const previousReturns = (this.data.returns || [])
       .filter(r => r.saleId === saleId)
       .reduce((sum, r) => sum + r.quantity, 0);
 
     if (returnQuantity > (sale.quantity - previousReturns)) {
-      return { success: false, message: 'İade miktarı satış miktarından fazla olamaz!' };
+      return { success: false, message: 'Ä°ade miktarÄ± satÄ±ÅŸ miktarÄ±ndan fazla olamaz!' };
     }
 
     this.addStock(sale.productId, sale.branchId, sale.size, returnQuantity);
@@ -1268,7 +1148,7 @@ class ShoeStore {
 
     const product = this.getProduct(sale.productId);
 
-    // Veresiye satış iade ediliyorsa müşteri borcundan düş
+    // Veresiye satÄ±ÅŸ iade ediliyorsa mÃ¼ÅŸteri borcundan dÃ¼ÅŸ
     if (sale.paymentMethod === 'Veresiye' && sale.customerId) {
       const customer = this.getCustomer(sale.customerId);
       if (customer) {
@@ -1282,13 +1162,13 @@ class ShoeStore {
           amount: totalRefund,
           saleId: sale.id,
           date: new Date().toISOString(),
-          description: `İade: ${product ? product.brand + ' ' + product.model : 'Ürün'} (${returnQuantity} adet)`
+          description: `Ä°ade: ${product ? product.brand + ' ' + product.model : 'ÃœrÃ¼n'} (${returnQuantity} adet)`
         });
       }
     }
 
     const branch = this.getBranch(sale.branchId);
-    this.addActivity('return', `İade: ${product ? product.brand + ' ' + product.model : ''} ${sale.size} no, ${returnQuantity} adet — ${branch ? branch.name : ''} (${this.formatCurrency(totalRefund)})`);
+    this.addActivity('return', `Ä°ade: ${product ? product.brand + ' ' + product.model : ''} ${sale.size} no, ${returnQuantity} adet â€” ${branch ? branch.name : ''} (${this.formatCurrency(totalRefund)})`);
     
     this.save();
     return { success: true, return: returnRecord };
@@ -1322,7 +1202,7 @@ class ShoeStore {
     return { count, totalRefund };
   }
 
-  // ---- Karlılık & Analiz İşlemleri ----
+  // ---- KarlÄ±lÄ±k & Analiz Ä°ÅŸlemleri ----
 
   getTotalProfit(branchId = null, startDate = null, endDate = null) {
     let sales = this.data.sales;
@@ -1387,7 +1267,7 @@ class ShoeStore {
 
     const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
 
-    // Zayiat/fire maliyetlerini de kârdan düş
+    // Zayiat/fire maliyetlerini de kÃ¢rdan dÃ¼ÅŸ
     let losses = this.data.losses || [];
     if (branchId) losses = losses.filter(l => l.branchId === branchId);
     if (startDate && endDate) {
@@ -1434,21 +1314,16 @@ class ShoeStore {
     const productGroups = {};
     sales.forEach(sale => {
       if (!productGroups[sale.productId]) {
-        productGroups[sale.productId] = { totalQty: 0, totalRevenue: 0, totalProfit: 0 };
+        productGroups[sale.productId] = { totalQty: 0, totalRevenue: 0 };
       }
       productGroups[sale.productId].totalQty += sale.quantity;
       productGroups[sale.productId].totalRevenue += sale.totalPrice;
-        const productObj = this.getProduct(sale.productId);
-        const cost = productObj ? (productObj.costPrice || 0) : 0;
-        productGroups[sale.productId].totalProfit += (sale.totalPrice - (cost * sale.quantity));
     });
 
     const sorted = Object.entries(productGroups)
       .map(([productId, stats]) => ({
         product: this.getProduct(productId),
         totalQty: stats.totalQty,
-          totalSold: stats.totalQty,
-          totalProfit: stats.totalProfit,
         totalRevenue: stats.totalRevenue
       }))
       .filter(item => item.product)
@@ -1460,7 +1335,7 @@ class ShoeStore {
 
   getBestSellingSizes(limit = 5) {
     const sizeGroups = {};
-    this.getSales().forEach(sale => {
+    this.data.sales.forEach(sale => {
       if (!sizeGroups[sale.size]) {
         sizeGroups[sale.size] = 0;
       }
@@ -1478,7 +1353,7 @@ class ShoeStore {
     return sorted;
   }
 
-  // ---- Aktivite İşlemleri ----
+  // ---- Aktivite Ä°ÅŸlemleri ----
 
   getActivities(limit = 50) {
     return [...this.data.activities].reverse().slice(0, limit);
@@ -1496,18 +1371,18 @@ class ShoeStore {
     }
   }
 
-  // ---- İçe / Dışa Aktarma & Otomatik Yedekleme ----
+  // ---- Ä°Ã§e / DÄ±ÅŸa Aktarma & Otomatik Yedekleme ----
 
   createDailyBackup(dataObj) {
     try {
       const today = new Date().toISOString().split('T')[0];
       const backupKey = 'bayyildiz_backup_' + today;
       
-      // Sadece o gün için henüz yedek alınmadıysa al
+      // Sadece o gÃ¼n iÃ§in henÃ¼z yedek alÄ±nmadÄ±ysa al
       if (!localStorage.getItem(backupKey)) {
         localStorage.setItem(backupKey, JSON.stringify(this._withoutSensitive(dataObj)));
         
-        // 7 günden eski yedekleri temizle
+        // 7 gÃ¼nden eski yedekleri temizle
         const keysToRemove = [];
         for (let i = 0; i < localStorage.length; i++) {
           const key = localStorage.key(i);
@@ -1522,7 +1397,7 @@ class ShoeStore {
         keysToRemove.forEach(k => localStorage.removeItem(k));
       }
     } catch (e) {
-      console.error('Otomatik yedek alınamadı:', e);
+      console.error('Otomatik yedek alÄ±namadÄ±:', e);
     }
   }
 
@@ -1541,23 +1416,23 @@ class ShoeStore {
     try {
       const backupKey = 'bayyildiz_backup_' + dateStr;
       const jsonString = localStorage.getItem(backupKey);
-      if (!jsonString) return { success: false, message: 'Seçili tarihe ait yedek bulunamadı.' };
+      if (!jsonString) return { success: false, message: 'SeÃ§ili tarihe ait yedek bulunamadÄ±.' };
       
       const result = this.validateDataShape(JSON.parse(jsonString));
       if (!result.ok) {
-        return { success: false, message: 'Yedek bozuk veya geçersiz: ' + result.message };
+        return { success: false, message: 'Yedek bozuk veya geÃ§ersiz: ' + result.message };
       }
       this._keepCurrentAuth(result.data);
       this.data = result.data;
       this.save();
-      this.addActivity('info', `Sistem ${dateStr} tarihli yedeğe geri döndürüldü.`);
-      return { success: true, message: `${dateStr} tarihli yedeğe başarıyla geri dönüldü.` };
+      this.addActivity('info', `Sistem ${dateStr} tarihli yedeÄŸe geri dÃ¶ndÃ¼rÃ¼ldÃ¼.`);
+      return { success: true, message: `${dateStr} tarihli yedeÄŸe baÅŸarÄ±yla geri dÃ¶nÃ¼ldÃ¼.` };
     } catch (e) {
-      return { success: false, message: 'Yedek geri yüklenirken hata oluştu: ' + e.message };
+      return { success: false, message: 'Yedek geri yÃ¼klenirken hata oluÅŸtu: ' + e.message };
     }
   }
 
-  /** Yedeğe/dışa aktarıma girmemesi gereken alanlar (PIN özetleri, site ayarları) çıkarılmış kopya */
+  /** YedeÄŸe/dÄ±ÅŸa aktarÄ±ma girmemesi gereken alanlar (PIN Ã¶zetleri, site ayarlarÄ±) Ã§Ä±karÄ±lmÄ±ÅŸ kopya */
   _withoutSensitive(dataObj) {
     const copy = JSON.parse(JSON.stringify(dataObj));
     delete copy.authStore;
@@ -1565,7 +1440,7 @@ class ShoeStore {
     return copy;
   }
 
-  /** Geri yüklenen verinin mevcut PIN özetlerini ezmesini engeller */
+  /** Geri yÃ¼klenen verinin mevcut PIN Ã¶zetlerini ezmesini engeller */
   _keepCurrentAuth(newData) {
     delete newData.webSettings;
     if (this.data && this.data.authStore) {
@@ -1584,30 +1459,30 @@ class ShoeStore {
     try {
       parsed = JSON.parse(jsonString);
     } catch (e) {
-      return { success: false, message: 'Dosya okunamadı: geçerli bir JSON yedeği değil.' };
+      return { success: false, message: 'Dosya okunamadÄ±: geÃ§erli bir JSON yedeÄŸi deÄŸil.' };
     }
 
     const result = this.validateDataShape(parsed);
     if (!result.ok) {
-      return { success: false, message: 'Geçersiz yedek dosyası: ' + result.message };
+      return { success: false, message: 'GeÃ§ersiz yedek dosyasÄ±: ' + result.message };
     }
 
     this._keepCurrentAuth(result.data);
     this.data = result.data;
     this.save();
-    return { success: true, message: 'Veriler başarıyla içe aktarıldı.' };
+    return { success: true, message: 'Veriler baÅŸarÄ±yla iÃ§e aktarÄ±ldÄ±.' };
   }
 
 
 
-  // ---- Dashboard İstatistikleri ----
+  // ---- Dashboard Ä°statistikleri ----
 
   getFilteredDashboardStats(branchId = 'all', dateRange = 'today') {
     let totalProducts = 0;
     let totalStock = 0;
     let totalStockValue = 0;
     
-    // Stoklar ve Ürün Sayısı
+    // Stoklar ve ÃœrÃ¼n SayÄ±sÄ±
     this.data.products.filter(p => !p.deletedAt).forEach(product => {
       let productStockInBranch = 0;
       
@@ -1622,20 +1497,20 @@ class ShoeStore {
       totalStock += productStockInBranch;
       totalStockValue += productStockInBranch * (parseFloat(product.price) || 0);
       
-      // Eğer şube filtresi varsa, o şubede stoku olan ürünleri say
+      // EÄŸer ÅŸube filtresi varsa, o ÅŸubede stoku olan Ã¼rÃ¼nleri say
       if (branchId !== 'all') {
         if (productStockInBranch > 0) {
           totalProducts++;
         }
       } else {
-        // Tüm şubeler seçiliyse, tüm aktif ürünler sayılır
+        // TÃ¼m ÅŸubeler seÃ§iliyse, tÃ¼m aktif Ã¼rÃ¼nler sayÄ±lÄ±r
         totalProducts++;
       }
     });
 
     const lowStockItems = this.getLowStockItems().filter(item => branchId === 'all' || item.branch.id === branchId);
     
-    // Tarih aralığı belirle
+    // Tarih aralÄ±ÄŸÄ± belirle
     const now = new Date();
     let startDate = new Date(0); // all
     if (dateRange === 'today') {
@@ -1649,8 +1524,8 @@ class ShoeStore {
       startDate = new Date(now.getFullYear(), now.getMonth(), 1);
     }
 
-    // Satışlar
-    const filteredSales = this.getSales().filter(s => {
+    // SatÄ±ÅŸlar
+    const filteredSales = this.data.sales.filter(s => {
       if (branchId !== 'all' && s.branchId !== branchId) return false;
       return new Date(s.date) >= startDate;
     });
@@ -1723,7 +1598,7 @@ class ShoeStore {
     const todayExpenses = (this.data.expenses || []).filter(e => new Date(e.date) >= todayStart);
     const todayExpensesTotal = todayExpenses.reduce((sum, e) => sum + e.amount, 0);
 
-    // Bugünkü veresiye tahsilatları (müşteri ödemeleri)
+    // BugÃ¼nkÃ¼ veresiye tahsilatlarÄ± (mÃ¼ÅŸteri Ã¶demeleri)
     let todayCollections = 0;
     (this.data.customers || []).forEach(c => {
       (c.payments || []).forEach(p => {
@@ -1733,10 +1608,10 @@ class ShoeStore {
       });
     });
 
-    // Veresiye satışları kasadan çıkar (kasaya nakit girmedi)
+    // Veresiye satÄ±ÅŸlarÄ± kasadan Ã§Ä±kar (kasaya nakit girmedi)
     const todayVeresiye = todaySalesByMethod['Veresiye'] || 0;
 
-    // Net Kasa = Nakit Satışlar + Tahsilatlar - Masraflar
+    // Net Kasa = Nakit SatÄ±ÅŸlar + Tahsilatlar - Masraflar
     const todayNetCash = (todaySalesTotal - todayVeresiye) + todayCollections - todayExpensesTotal;
 
     const totalStockValue = this.getTotalStockValue();
@@ -1796,13 +1671,13 @@ class ShoeStore {
     }));
   }
 
-  // ---- Yardımcı ----
+  // ---- YardÄ±mcÄ± ----
 
   formatCurrency(amount) {
     return new Intl.NumberFormat('tr-TR', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
-    }).format(amount) + ' ₺';
+    }).format(amount) + ' â‚º';
   }
 
   formatDate(dateStr) {
@@ -1825,7 +1700,7 @@ class ShoeStore {
 
   getSettings() {
     if (!this.data.settings.managers) {
-      this.data.settings.managers = ['Ahmet', 'Ayşe', 'Mehmet'];
+      this.data.settings.managers = ['Ahmet', 'AyÅŸe', 'Mehmet'];
     } else if (!Array.isArray(this.data.settings.managers) && typeof this.data.settings.managers === 'object') {
       this.data.settings.managers = Object.values(this.data.settings.managers);
     }
@@ -1833,12 +1708,12 @@ class ShoeStore {
   }
 
   // ==========================================
-  // BAYYILDIZ Resmi Ürün Kataloğu & Stok Yükleyici
+  // BAYYILDIZ Resmi ÃœrÃ¼n KataloÄŸu & Stok YÃ¼kleyici
   // ==========================================
 
   loadSampleData(data) {
     const bayyildizProducts = [
-      // --- ERKEK HAKİKİ DERİ KOLEKSİYONU ---
+      // --- ERKEK HAKÄ°KÄ° DERÄ° KOLEKSÄ°YONU ---
       {
         brand: 'BAYYILDIZ',
         model: 'Hakiki Dana Derisi Klasik Oxford',
@@ -1861,7 +1736,7 @@ class ShoeStore {
       },
       {
         brand: 'BAYYILDIZ',
-        model: 'İtalyan Kösele Tabanlı Takım Ayakkabısı',
+        model: 'Ä°talyan KÃ¶sele TabanlÄ± TakÄ±m AyakkabÄ±sÄ±',
         category: 'Klasik',
         gender: 'Erkek',
         color: 'Bordo',
@@ -1871,7 +1746,7 @@ class ShoeStore {
       },
       {
         brand: 'BAYYILDIZ',
-        model: 'Hakiki Deri El Dikişli Püsküllü Loafer',
+        model: 'Hakiki Deri El DikiÅŸli PÃ¼skÃ¼llÃ¼ Loafer',
         category: 'Loafer & Makosen',
         gender: 'Erkek',
         color: 'Lacivert',
@@ -1881,7 +1756,7 @@ class ShoeStore {
       },
       {
         brand: 'BAYYILDIZ',
-        model: 'Hakiki Deri El Dikişli Püsküllü Loafer',
+        model: 'Hakiki Deri El DikiÅŸli PÃ¼skÃ¼llÃ¼ Loafer',
         category: 'Loafer & Makosen',
         gender: 'Erkek',
         color: 'Taba',
@@ -1891,7 +1766,7 @@ class ShoeStore {
       },
       {
         brand: 'BAYYILDIZ',
-        model: 'Hakiki Süet Deri Tokalı Makosen',
+        model: 'Hakiki SÃ¼et Deri TokalÄ± Makosen',
         category: 'Loafer & Makosen',
         gender: 'Erkek',
         color: 'Vizon / Haki',
@@ -1901,7 +1776,7 @@ class ShoeStore {
       },
       {
         brand: 'BAYYILDIZ',
-        model: 'Hakiki Deri El Örgüsü Yazlık Ayakkabı',
+        model: 'Hakiki Deri El Ã–rgÃ¼sÃ¼ YazlÄ±k AyakkabÄ±',
         category: 'Loafer & Makosen',
         gender: 'Erkek',
         color: 'Kahverengi',
@@ -1931,7 +1806,7 @@ class ShoeStore {
       },
       {
         brand: 'BAYYILDIZ',
-        model: 'Comfort Ortopedik Hakiki Deri Yürüyüş',
+        model: 'Comfort Ortopedik Hakiki Deri YÃ¼rÃ¼yÃ¼ÅŸ',
         category: 'Comfort & Ortopedik',
         gender: 'Erkek',
         color: 'Siyah',
@@ -1941,7 +1816,7 @@ class ShoeStore {
       },
       {
         brand: 'BAYYILDIZ',
-        model: 'Hakiki Dana Derisi Chelsea Kışlık Bot',
+        model: 'Hakiki Dana Derisi Chelsea KÄ±ÅŸlÄ±k Bot',
         category: 'Bot',
         gender: 'Erkek',
         color: 'Siyah',
@@ -1951,7 +1826,7 @@ class ShoeStore {
       },
       {
         brand: 'BAYYILDIZ',
-        model: 'İçi Kürklü Hakiki Deri Fermuarlı Bot',
+        model: 'Ä°Ã§i KÃ¼rklÃ¼ Hakiki Deri FermuarlÄ± Bot',
         category: 'Bot',
         gender: 'Erkek',
         color: 'Taba / Kahve',
@@ -1961,7 +1836,7 @@ class ShoeStore {
       },
       {
         brand: 'BAYYILDIZ',
-        model: 'Rugan Hakiki Deri Damatlık Ayakkabı',
+        model: 'Rugan Hakiki Deri DamatlÄ±k AyakkabÄ±',
         category: 'Klasik',
         gender: 'Erkek',
         color: 'Parlak Siyah',
@@ -1970,12 +1845,12 @@ class ShoeStore {
         supplierId: 'sup_kosele'
       },
 
-      // --- KADIN HAKİKİ DERİ KOLEKSİYONU ---
+      // --- KADIN HAKÄ°KÄ° DERÄ° KOLEKSÄ°YONU ---
       {
         brand: 'BAYYILDIZ',
-        model: 'Kadın Hakiki Deri Comfort Loafer',
+        model: 'KadÄ±n Hakiki Deri Comfort Loafer',
         category: 'Loafer & Makosen',
-        gender: 'Kadın',
+        gender: 'KadÄ±n',
         color: 'Bej / Krem',
         price: 2890,
         barcode: '8698901002011',
@@ -1983,9 +1858,9 @@ class ShoeStore {
       },
       {
         brand: 'BAYYILDIZ',
-        model: 'Kadın Hakiki Deri Comfort Loafer',
+        model: 'KadÄ±n Hakiki Deri Comfort Loafer',
         category: 'Loafer & Makosen',
-        gender: 'Kadın',
+        gender: 'KadÄ±n',
         color: 'Siyah',
         price: 2890,
         barcode: '8698901002028',
@@ -1993,9 +1868,9 @@ class ShoeStore {
       },
       {
         brand: 'BAYYILDIZ',
-        model: 'Kadın Hakiki Deri Şık Stiletto Topuklu',
+        model: 'KadÄ±n Hakiki Deri ÅÄ±k Stiletto Topuklu',
         category: 'Topuklu & Babet',
-        gender: 'Kadın',
+        gender: 'KadÄ±n',
         color: 'Siyah',
         price: 3290,
         barcode: '8698901002035',
@@ -2003,9 +1878,9 @@ class ShoeStore {
       },
       {
         brand: 'BAYYILDIZ',
-        model: 'Kadın Hakiki Deri Şık Stiletto Topuklu',
+        model: 'KadÄ±n Hakiki Deri ÅÄ±k Stiletto Topuklu',
         category: 'Topuklu & Babet',
-        gender: 'Kadın',
+        gender: 'KadÄ±n',
         color: 'Nude / Ten',
         price: 3290,
         barcode: '8698901002042',
@@ -2013,9 +1888,9 @@ class ShoeStore {
       },
       {
         brand: 'BAYYILDIZ',
-        model: 'Kadın Hakiki Süet Deri Yarım Bot',
+        model: 'KadÄ±n Hakiki SÃ¼et Deri YarÄ±m Bot',
         category: 'Bot',
-        gender: 'Kadın',
+        gender: 'KadÄ±n',
         color: 'Vizon',
         price: 3990,
         barcode: '8698901002059',
@@ -2023,9 +1898,9 @@ class ShoeStore {
       },
       {
         brand: 'BAYYILDIZ',
-        model: 'Kadın Hakiki Deri Comfort Sneaker',
+        model: 'KadÄ±n Hakiki Deri Comfort Sneaker',
         category: 'Deri Sneaker',
-        gender: 'Kadın',
+        gender: 'KadÄ±n',
         color: 'Beyaz / Platin',
         price: 2790,
         barcode: '8698901002066',
@@ -2033,9 +1908,9 @@ class ShoeStore {
       },
       {
         brand: 'BAYYILDIZ',
-        model: 'Kadın Hakiki Deri Babet',
+        model: 'KadÄ±n Hakiki Deri Babet',
         category: 'Topuklu & Babet',
-        gender: 'Kadın',
+        gender: 'KadÄ±n',
         color: 'Pudra',
         price: 2490,
         barcode: '8698901002073',
@@ -2043,9 +1918,9 @@ class ShoeStore {
       },
       {
         brand: 'BAYYILDIZ',
-        model: 'Kadın Hakiki Deri Yazlık Sandalet',
+        model: 'KadÄ±n Hakiki Deri YazlÄ±k Sandalet',
         category: 'Sandalet',
-        gender: 'Kadın',
+        gender: 'KadÄ±n',
         color: 'Taba',
         price: 1990,
         barcode: '8698901002080',
@@ -2071,7 +1946,7 @@ class ShoeStore {
       data.branches.forEach(branch => {
         data.stock[id][branch.id] = {};
         sizes.forEach(size => {
-          // Gerçekçi mağaza stok dağılımı (popüler numaralarda daha çok, uç numaralarda daha az)
+          // GerÃ§ekÃ§i maÄŸaza stok daÄŸÄ±lÄ±mÄ± (popÃ¼ler numaralarda daha Ã§ok, uÃ§ numaralarda daha az)
           let baseQty = 0;
           if (prod.gender === 'Erkek') {
             if ([41, 42, 43].includes(size)) baseQty = Math.floor(Math.random() * 6) + 3; // 3 - 8 adet
@@ -2083,7 +1958,7 @@ class ShoeStore {
             else baseQty = Math.random() < 0.5 ? 1 : 0; // 0 - 1 adet
           }
 
-          // Heykel Merkez şubede stok biraz daha geniş
+          // Heykel Merkez ÅŸubede stok biraz daha geniÅŸ
           if (branch.id === 'heykel' && baseQty > 0) {
             baseQty = Math.min(12, baseQty + Math.floor(Math.random() * 2));
           }
@@ -2093,13 +1968,13 @@ class ShoeStore {
       });
     });
 
-    // Gerçekçi son 30 günlük Bayyıldız satış kayıtları
+    // GerÃ§ekÃ§i son 30 gÃ¼nlÃ¼k BayyÄ±ldÄ±z satÄ±ÅŸ kayÄ±tlarÄ±
     for (let i = 0; i < 40; i++) {
       const product = data.products[Math.floor(Math.random() * data.products.length)];
       const branch = data.branches[Math.random() < 0.6 ? 0 : 1]; // Heykel %60, FSM %40
       const sizes = data.settings.sizes[product.gender];
       const size = sizes[Math.floor(Math.random() * sizes.length)];
-      const qty = Math.floor(Math.random() * 2) + 1; // 1-2 çift
+      const qty = Math.floor(Math.random() * 2) + 1; // 1-2 Ã§ift
       const daysAgo = Math.floor(Math.random() * 30);
       const saleDate = new Date(now - daysAgo * 86400000);
       saleDate.setHours(Math.floor(Math.random() * 10) + 10, Math.floor(Math.random() * 60));
@@ -2116,7 +1991,7 @@ class ShoeStore {
       });
     }
 
-    // Gerçekçi Heykel <-> FSM transferleri
+    // GerÃ§ekÃ§i Heykel <-> FSM transferleri
     for (let i = 0; i < 10; i++) {
       const product = data.products[Math.floor(Math.random() * data.products.length)];
       const fromIdx = Math.random() < 0.6 ? 0 : 1;
@@ -2137,12 +2012,12 @@ class ShoeStore {
     }
 
     data.activities.push(
-      { id: 'act_1', type: 'info', description: 'BAYYILDIZ Ayakkabı 1989 resmi ürün kataloğu yüklendi', date: new Date(now - 30 * 86400000).toISOString() },
-      { id: 'act_2', type: 'stock_in', description: 'Heykel Merkez ve FSM şubesi beden stokları girildi', date: new Date(now - 30 * 86400000).toISOString() },
-      { id: 'act_3', type: 'info', description: 'BAYYILDIZ Ayakkabı Stok & Satış Yönetim Sistemi devrede', date: now.toISOString() }
+      { id: 'act_1', type: 'info', description: 'BAYYILDIZ AyakkabÄ± 1989 resmi Ã¼rÃ¼n kataloÄŸu yÃ¼klendi', date: new Date(now - 30 * 86400000).toISOString() },
+      { id: 'act_2', type: 'stock_in', description: 'Heykel Merkez ve FSM ÅŸubesi beden stoklarÄ± girildi', date: new Date(now - 30 * 86400000).toISOString() },
+      { id: 'act_3', type: 'info', description: 'BAYYILDIZ AyakkabÄ± Stok & SatÄ±ÅŸ YÃ¶netim Sistemi devrede', date: now.toISOString() }
     );
   }
-  // ---- Müşteri Yorumları İşlemleri ----
+  // ---- MÃ¼ÅŸteri YorumlarÄ± Ä°ÅŸlemleri ----
 
   getReviews() {
     return this.data.reviews || [];
@@ -2152,14 +2027,14 @@ class ShoeStore {
     if (!this.data.reviews) this.data.reviews = [];
     const newReview = {
       id: this.generateId(),
-      customerName: review.customerName || 'İsimsiz',
+      customerName: review.customerName || 'Ä°simsiz',
       productName: review.productName || 'Belirtilmedi',
       rating: parseFloat(review.rating) || 5,
       comment: review.comment || '',
       date: review.date || new Date().toISOString()
     };
     this.data.reviews.push(newReview);
-    this.addActivity('info', `Yeni müşteri yorumu eklendi: ${newReview.customerName}`);
+    this.addActivity('info', `Yeni mÃ¼ÅŸteri yorumu eklendi: ${newReview.customerName}`);
     this.save();
     return newReview;
   }
@@ -2174,7 +2049,7 @@ class ShoeStore {
       ...updates
     };
 
-    this.addActivity('info', `Yorum güncellendi: ${this.data.reviews[index].customerName}`);
+    this.addActivity('info', `Yorum gÃ¼ncellendi: ${this.data.reviews[index].customerName}`);
     this.save();
     return this.data.reviews[index];
   }

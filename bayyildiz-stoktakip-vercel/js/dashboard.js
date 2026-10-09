@@ -1,4 +1,4 @@
-const DashboardPage = {
+﻿const DashboardPage = {
   state: { branchId: 'all', dateRange: 'today' },
   pagination: {
     activities: { current: 1, limit: 6 },
@@ -486,7 +486,7 @@ const DashboardPage = {
       
       // Satışları günlere dağıt
       if (store.data && store.data.sales) {
-          Object.values(store.data.sales).forEach(sale => {
+          store.getSales().forEach(sale => {
               if (sale.status === 'completed' || sale.status === 'completed_cash' || sale.status === 'completed_card' || !sale.status) {
                   const sDate = new Date(sale.date);
                   const sDateStr = store.formatDate(sDate.toISOString()).split(' ')[0];

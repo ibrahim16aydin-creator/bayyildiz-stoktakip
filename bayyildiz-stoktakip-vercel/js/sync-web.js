@@ -1,9 +1,10 @@
 window.startWebSync = async function() {
     try {
         const cloudName = 'k7wiev69';
-        const uploadPreset = 'bayyildiz_unsigned';
+        const apiKey = '285121773826433';
+        const apiSecret = 'd4xCQS7OxTqRc02uLE4JWrrpraI';
         
-        App.toast('Sitemap alınıyor...', 'info');
+        App.toast('Sitemap aliniyor...', 'info');
         const sitemapRes = await fetch('https://bayyildiz.com/sitemap.xml');
         const sitemapText = await sitemapRes.text();
         
@@ -14,10 +15,9 @@ window.startWebSync = async function() {
             urls.push(match[1]);
         }
         
-        App.toast(`Sitemap'te ${urls.length} ürün bulundu, taranıyor...`, 'info');
+        App.toast('Sitemap te ' + urls.length + ' urun bulundu, taraniyor...', 'info');
         
         let newCount = 0;
-        let updateCount = 0;
         
         // Islem yapilacak urunleri biriktir
         const productsToAdd = [];
@@ -27,11 +27,8 @@ window.startWebSync = async function() {
             const slug = url.split('/').pop();
             const barcode = slug; // Fallback barcode
             
-            // Oncelikle veritabaninda var mi hizlica kontrol edelim (URL slug'dan yola cikarak)
-            // Normalde tam eslesme icin json-ld'yi cekmek daha iyidir ama hizlandirmak icin
-            // once json-ld'yi cekiyoruz.
             try {
-                const res = await fetch(url);
+                const res = await fetch('http://localhost:3032/?url=' + encodeURIComponent(url));
                 const text = await res.text();
                 
                 const jsonLdMatch = text.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
@@ -40,7 +37,11 @@ window.startWebSync = async function() {
                     const sku = data.sku || barcode;
                     const modelName = data.name;
                     
-                    const exists = store.data.products.find(x => x.model === modelName || x.barcode === sku || x.id === sku);
+                    const exists = store.data.products.find(x => {
+                        if (!x || !x.model) return false;
+                        const modelCode = x.model.split(' ').pop().toLowerCase();
+                        return slug.toLowerCase().includes(modelCode) || (x.barcode && x.barcode === sku) || (x.id && x.id === sku);
+                    });
                     
                     if (!exists) {
                         productsToAdd.push({
@@ -58,11 +59,11 @@ window.startWebSync = async function() {
         }
         
         if (productsToAdd.length === 0) {
-            App.toast('Taranan ürünlerin hepsi zaten sistemde mevcut.', 'success');
+            App.toast('Taranan urunlerin hepsi zaten sistemde mevcut.', 'success');
             return;
         }
         
-        App.toast(`${productsToAdd.length} yeni ürün bulundu, görseller Cloudinary'ye aktarılıyor...`, 'info');
+        App.toast(productsToAdd.length + ' yeni urun bulundu, gorseller aktariliyor...', 'info');
         
         for (let i = 0; i < productsToAdd.length; i++) {
             const p = productsToAdd[i];
@@ -70,16 +71,26 @@ window.startWebSync = async function() {
             
             if (p.image) {
                 try {
+                    const timestamp = Math.floor(Date.now() / 1000);
+                    const strToSign = `timestamp=${timestamp}${apiSecret}`;
+                    const encoder = new TextEncoder();
+                    const dataToSign = encoder.encode(strToSign);
+                    const hashBuffer = await crypto.subtle.digest('SHA-1', dataToSign);
+                    const hashArray = Array.from(new Uint8Array(hashBuffer));
+                    const signature = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                    
                     const formData = new FormData();
                     formData.append('file', p.image);
-                    formData.append('upload_preset', uploadPreset);
-            
+                    formData.append('api_key', apiKey);
+                    formData.append('timestamp', timestamp);
+                    formData.append('signature', signature);
+                    
                     const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
                         method: 'POST',
                         body: formData
                     });
+                    
                     const result = await response.json();
-            
                     if (result.secure_url) {
                         finalImageUrl = result.secure_url;
                     }
@@ -89,9 +100,9 @@ window.startWebSync = async function() {
             }
             
             store.addProduct({
-                brand: 'Bayyıldız',
+                brand: 'Bayyildiz',
                 model: p.name,
-                category: p.name.toLowerCase().includes('bot') ? 'Bot' : 'Günlük',
+                category: p.name.toLowerCase().includes('bot') ? 'Bot' : 'Gunluk',
                 gender: 'Erkek',
                 season: '4 Mevsim',
                 price: p.price,
@@ -108,10 +119,10 @@ window.startWebSync = async function() {
             ProductsPage.render();
         }
         
-        App.toast(`${newCount} yeni ürün başarıyla eklendi ve senkronize edildi!`, 'success');
+        App.toast(newCount + ' yeni urun basariyla eklendi ve senkronize edildi!', 'success');
         
     } catch(err) {
         console.error('Sync error:', err);
-        App.toast('Senkronizasyon sırasında hata oluştu: ' + err.message, 'error');
+        App.toast('Senkronizasyon sirasinda hata olustu: ' + err.message, 'error');
     }
 };

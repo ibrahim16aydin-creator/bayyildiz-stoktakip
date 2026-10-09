@@ -1,4 +1,4 @@
-const ReportsPage = {
+﻿const ReportsPage = {
   activeBranchId: null,
   dateFilter: 'all',
   customStart: '',
@@ -350,7 +350,7 @@ const ReportsPage = {
     return html;
   },
 
-  getSalesForDateRange(salesArr = store.data.sales) {
+  getSalesForDateRange(salesArr = store.getSales()) {
     if (this.dateFilter === 'all') return salesArr;
 
     let start = new Date();
@@ -386,7 +386,7 @@ const ReportsPage = {
   },
 
   renderDailyCashReport() {
-    let sales = this.getSalesForDateRange(store.data.sales);
+    let sales = this.getSalesForDateRange(store.getSales());
     if (this.activeBranchId) {
       sales = sales.filter(s => s.branchId === this.activeBranchId);
     }
@@ -747,7 +747,7 @@ const ReportsPage = {
   },
 
   renderPersonnelPerformance() {
-    let sales = this.getSalesForDateRange(store.data.sales);
+    let sales = this.getSalesForDateRange(store.getSales());
     if (this.activeBranchId) {
       sales = sales.filter(s => s.branchId === this.activeBranchId);
     }
