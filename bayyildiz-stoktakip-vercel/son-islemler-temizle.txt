@@ -1,4 +1,0 @@
-store.data.activities = [];
-store.save();
-alert("Son işlemler başarıyla temizlendi!");
-if (typeof DashboardPage !== 'undefined') DashboardPage.render();
