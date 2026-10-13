@@ -446,6 +446,73 @@ const App = {
     ).join('');
   },
 
+  // ---- Yardımcı: Ürün <select> listesine marka / model / barkod arama kutusu ekler ----
+  // Liste filtrelenir; seçili ürün değişirse select üzerinde 'change' olayı tetiklenir.
+  attachProductSearch(selectEl) {
+    if (!selectEl || selectEl.dataset.searchAttached) return;
+    selectEl.dataset.searchAttached = '1';
+
+    const allOptions = Array.from(selectEl.options)
+      .map(o => ({ value: o.value, text: o.textContent, product: store.getProduct(o.value) }))
+      .filter(o => !(o.product && o.product.deletedAt));
+
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:6px;align-items:center;margin-bottom:8px;';
+    row.innerHTML = `
+      <input type="text" class="form-input product-select-search" placeholder="Marka, model, renk veya barkod ara..." autocomplete="off" style="flex:1;">
+      <button type="button" class="btn btn-secondary btn-sm product-select-scan" title="Barkod Tara">📷</button>
+    `;
+    const countInfo = document.createElement('div');
+    countInfo.className = 'text-muted';
+    countInfo.style.cssText = 'font-size:0.75rem;margin-top:4px;';
+
+    selectEl.parentNode.insertBefore(row, selectEl);
+    selectEl.insertAdjacentElement('afterend', countInfo);
+
+    const input = row.querySelector('.product-select-search');
+    const scanBtn = row.querySelector('.product-select-scan');
+
+    const applyFilter = () => {
+      const q = input.value.trim();
+      const prevValue = selectEl.value;
+
+      // Birebir barkod eşleşmesi varsa sadece o ürünü göster
+      const exact = q ? store.getProductByBarcode(q) : null;
+      const matches = exact
+        ? allOptions.filter(o => String(o.value) === String(exact.id))
+        : allOptions.filter(o => !q || store.matchProductQuery(o.product, q));
+
+      if (matches.length === 0) {
+        selectEl.innerHTML = '<option value="" disabled selected>Ürün bulunamadı</option>';
+      } else {
+        selectEl.innerHTML = matches
+          .map(o => `<option value="${esc(o.value)}">${esc(o.text)}</option>`)
+          .join('');
+        selectEl.value = matches.some(o => String(o.value) === String(prevValue)) ? prevValue : matches[0].value;
+      }
+
+      countInfo.textContent = q ? `${matches.length} ürün bulundu` : '';
+      if (selectEl.value !== prevValue) selectEl.dispatchEvent(new Event('change'));
+    };
+
+    input.addEventListener('input', applyFilter);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); applyFilter(); selectEl.focus(); }
+    });
+
+    scanBtn.addEventListener('click', () => {
+      BarcodeScanner.openScanner((code) => {
+        const p = store.getProductByBarcode(code);
+        input.value = p ? (p.barcode || `${p.brand} ${p.model}`) : code;
+        applyFilter();
+        if (p && selectEl.value !== String(p.id)) {
+          selectEl.value = p.id;
+          selectEl.dispatchEvent(new Event('change'));
+        }
+      }, 'Ürün Seçmek İçin Barkod Tara');
+    });
+  },
+
   getBranchOptions(selectedId = '', excludeId = '') {
     return store.getBranches()
       .filter(b => b.id !== excludeId)

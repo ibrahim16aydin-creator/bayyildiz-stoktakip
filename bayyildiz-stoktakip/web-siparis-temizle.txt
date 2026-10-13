@@ -1,0 +1,6 @@
+firebase.database().ref('orders').remove().then(() => {
+    alert("Tüm web siparişleri veritabanından başarıyla silindi ve sayfa sıfırlandı!");
+    WebOrders.loadOrders(); // Sayfayı yenilemeye gerek kalmadan ekrandan temizler
+}).catch(e => {
+    alert("Silinirken bir hata oluştu: " + e.message);
+});

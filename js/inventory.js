@@ -346,6 +346,7 @@ const InventoryPage = {
     const branchSelect = document.getElementById('count-branch');
     const productSelect = document.getElementById('count-product');
     const sizesContainer = document.getElementById('count-sizes-container');
+    App.attachProductSearch(productSelect);
 
     const renderSizes = () => {
       const branchId = branchSelect.value;
@@ -743,6 +744,7 @@ const InventoryPage = {
     const productSelect = document.getElementById('loss-product');
     const branchSelect = document.getElementById('loss-branch');
     const sizeSelect = document.getElementById('loss-size');
+    App.attachProductSearch(productSelect);
 
     const updateSizes = () => {
       const pId = productSelect.value;

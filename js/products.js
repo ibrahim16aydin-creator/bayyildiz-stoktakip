@@ -1257,7 +1257,7 @@ const ProductsPage = {
         const barcodeInput = content.querySelector('#prod-barcode');
         if (barcodeInput) barcodeInput.value = code;
         App.toast(`Barkod okundu: ${code}`, 'success');
-      }, 'Ürün Barkodunu Tara');
+      }, 'Ürün Barkodunu Tara', { productSearch: false });
     });
 
         // Otomatik barkod üretme butonu

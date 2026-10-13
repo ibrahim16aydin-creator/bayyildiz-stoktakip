@@ -311,9 +311,12 @@ const BarcodeScanner = {
   // ====================================================
   // ---- Barkod Tarama Modalı (Kamera + Tabanca + Manuel) ----
   // ====================================================
-  async openScanner(onSuccessCallback, title = 'Barkod / QR Tara') {
+  async openScanner(onSuccessCallback, title = 'Barkod / QR Tara', opts = {}) {
     this.stopScanner();
     this._injectScannerStyles();
+
+    // Ürün formundaki barkod alanı gibi yerlerde sadece barkod istenir → productSearch:false
+    const productSearch = opts.productSearch !== false;
 
     const modalHtml = `
       <div class="scanner-modal-body">
@@ -353,15 +356,17 @@ const BarcodeScanner = {
         <div id="scanner-panel-manual" style="display:none;">
           <div style="padding:20px 0;">
             <p style="font-size:0.83rem;color:var(--text-secondary);margin-bottom:12px;line-height:1.5;">
-              Barkod numarasını klavye ile yazın veya yapıştırın.<br>
-              <strong>İpucu:</strong> Tabancadan kopyalanan barkod buraya da yapıştırılabilir.
+              ${productSearch
+                ? 'Barkod numarasını yazın <strong>veya marka / model adıyla</strong> arayıp listeden ürünü seçin.'
+                : 'Barkod numarasını klavye ile yazın veya yapıştırın.<br><strong>İpucu:</strong> Tabancadan kopyalanan barkod buraya da yapıştırılabilir.'}
             </p>
             <div style="display:flex;gap:8px;">
-              <input type="text" id="scanner-manual-input" class="form-input"
-                placeholder="Barkod numarasını yazın veya yapıştırın..." autofocus
-                style="flex:1;font-size:1rem;font-family:monospace;letter-spacing:0.05em;">
+              <input type="text" id="scanner-manual-input" class="form-input" autocomplete="off"
+                placeholder="${productSearch ? 'Barkod, marka veya model...' : 'Barkod numarasını yazın veya yapıştırın...'}" autofocus
+                style="flex:1;font-size:1rem;letter-spacing:0.02em;">
               <button type="button" id="scanner-manual-submit" class="btn btn-primary">✔ Onayla</button>
             </div>
+            <div id="scanner-manual-results" class="sale-product-results hidden" style="position:static;margin-top:8px;box-shadow:none;"></div>
             <div style="margin-top:6px;font-size:0.73rem;color:var(--text-muted);">Enter tuşu ile de onaylayabilirsiniz</div>
           </div>
         </div>
@@ -409,10 +414,42 @@ const BarcodeScanner = {
       if (typeof onSuccessCallback === 'function') onSuccessCallback(code.trim());
     };
 
+    // Manuel giriş: barkod birebir eşleşmiyorsa ve tek bir ürün bulunduysa onu seç
+    const resolveManual = (v) => {
+      if (!productSearch || store.getProductByBarcode(v)) return v;
+      const matches = store.findProducts(v, 2);
+      if (matches.length === 1) return String(matches[0].barcode || matches[0].id);
+      return v;
+    };
+
     if (manualBtn && manualInput) {
-      manualBtn.addEventListener('click', () => { const v = manualInput.value.trim(); if (v) handleSuccess(v); });
+      manualBtn.addEventListener('click', () => { const v = manualInput.value.trim(); if (v) handleSuccess(resolveManual(v)); });
       manualInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); const v = manualInput.value.trim(); if (v) handleSuccess(v); }
+        if (e.key === 'Enter') { e.preventDefault(); const v = manualInput.value.trim(); if (v) handleSuccess(resolveManual(v)); }
+      });
+    }
+
+    // Marka / model ile canlı ürün arama
+    const manualResults = document.getElementById('scanner-manual-results');
+    if (productSearch && manualInput && manualResults) {
+      manualInput.addEventListener('input', () => {
+        const q = manualInput.value.trim();
+        if (q.length < 2) { manualResults.classList.add('hidden'); manualResults.innerHTML = ''; return; }
+        const found = store.findProducts(q, 8);
+        if (found.length === 0) {
+          manualResults.innerHTML = '<div class="spr-empty">Ürün bulunamadı — Enter ile barkod olarak aranır</div>';
+        } else {
+          manualResults.innerHTML = found.map(p => `
+            <div class="spr-item" data-code="${esc(String(p.barcode || p.id))}">
+              <div class="spr-name">${esc(p.brand)} ${esc(p.model)}</div>
+              <div class="spr-meta">${esc(p.color || '')}${p.barcode ? ' · ' + esc(p.barcode) : ''} · ${store.formatCurrency(p.price)}</div>
+            </div>`).join('');
+        }
+        manualResults.classList.remove('hidden');
+      });
+      manualResults.addEventListener('click', (e) => {
+        const item = e.target.closest('.spr-item');
+        if (item && item.dataset.code) handleSuccess(item.dataset.code);
       });
     }
 

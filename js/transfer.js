@@ -180,6 +180,7 @@ const TransferPage = {
     const sizeSelect = document.getElementById('transfer-size');
     const stockInfo = document.getElementById('transfer-stock-info');
     const qtyInput = document.getElementById('transfer-qty');
+    App.attachProductSearch(productSelect);
 
     const updateSizeOptions = () => {
       const pId = productSelect.value;

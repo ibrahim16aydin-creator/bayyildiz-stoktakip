@@ -1,4 +1,4 @@
-﻿// ==========================================
+// ==========================================
 // BAYYILDIZ Ayakkabı — Veri Yönetim Katmanı (Store)
 // ==========================================
 
@@ -567,7 +567,32 @@ class ShoeStore {
   getProductByBarcode(barcode) {
     if (!barcode) return null;
     const cleanBarcode = barcode.toString().trim().toLowerCase();
-    return this.data.products.find(p => p.barcode && p.barcode.toString().trim().toLowerCase() === cleanBarcode);
+    const byBarcode = this.data.products.find(p => p.barcode && p.barcode.toString().trim().toLowerCase() === cleanBarcode);
+    if (byBarcode) return byBarcode;
+    // Yedek: Manuel aramada barkodu olmayan bir ürün seçildiğinde ürün ID'si iletilir
+    return this.data.products.find(p => p.id !== undefined && String(p.id) === barcode.toString().trim()) || null;
+  }
+
+  // Ürünün marka, model, renk, stok kodu veya barkodunda arama metni geçiyor mu?
+  // Birden fazla kelime girildiğinde (ör. "nike air") tüm kelimeler eşleşmelidir.
+  matchProductQuery(p, query) {
+    if (!p) return false;
+    const raw = (query || '').toString().trim();
+    if (!raw) return true;
+    if (p.id !== undefined && String(p.id) === raw) return true;
+    const haystack = [p.brand, p.model, p.color, p.stockCode, p.barcode, p.category]
+      .filter(v => v !== undefined && v !== null)
+      .map(v => v.toString().toLocaleLowerCase('tr'))
+      .join(' ');
+    return raw.toLocaleLowerCase('tr').split(/\s+/).every(word => haystack.includes(word));
+  }
+
+  // Hızlı ürün araması (silinmemiş ürünler, en fazla `limit` sonuç)
+  findProducts(query, limit = 8) {
+    const raw = (query || '').toString().trim();
+    if (!raw) return [];
+    const results = this.data.products.filter(p => !p.deletedAt && this.matchProductQuery(p, raw));
+    return limit ? results.slice(0, limit) : results;
   }
 
   addProduct(product) {
@@ -770,13 +795,7 @@ class ShoeStore {
     let results = this.data.products.filter(p => !p.deletedAt);
 
     if (query) {
-      const q = query.toLocaleLowerCase('tr').trim();
-      results = results.filter(p =>
-        (p.brand || '').toLocaleLowerCase('tr').includes(q) ||
-        (p.model || '').toLocaleLowerCase('tr').includes(q) ||
-        (p.color || '').toLocaleLowerCase('tr').includes(q) ||
-        (p.barcode && p.barcode.toString().toLocaleLowerCase('tr').includes(q))
-      );
+      results = results.filter(p => this.matchProductQuery(p, query));
     }
 
     if (filters.gender && filters.gender !== 'Tümü') results = results.filter(p => p.gender === filters.gender);
