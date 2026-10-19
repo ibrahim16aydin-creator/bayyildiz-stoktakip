@@ -158,7 +158,7 @@ const App = {
       sales: 'Satışlar',
       reports: 'Raporlar',
       user: 'Güvenlik & Profil',
-      backup: 'Sistem Yedekleme',
+      backup: 'Veri Aktarımı',
       settings: 'Sistem Ayarları'
     };
     const mobileTitleEl = document.getElementById('mobile-page-title');

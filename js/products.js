@@ -13,6 +13,7 @@ const ProductsPage = {
     seasonFilter: 'all',
     supplierFilter: 'Tümü',
     stockStatusFilter: 'Tümü',
+    webStatusFilter: 'Tümü',
     sortOrder: 'default',
     selectedIds: new Set()
   },
@@ -220,6 +221,11 @@ const ProductsPage = {
         this.state.stockStatusFilter = e.target.value;
         this.renderTable();
       }
+      if (e.target.id === 'filter-web-status') {
+        this.state.webStatusFilter = e.target.value;
+        this.state.currentPage = 1;
+        this.renderTable();
+      }
       if (e.target.id === 'filter-sort') {
         this.state.sortOrder = e.target.value;
         this.renderTable();
@@ -243,6 +249,7 @@ const ProductsPage = {
     this.state.seasonFilter = 'all';
     this.state.supplierFilter = 'Tümü';
     this.state.stockStatusFilter = 'Tümü';
+    this.state.webStatusFilter = 'Tümü';
     this.state.sortOrder = 'default';
     this.render();
   },
@@ -334,6 +341,12 @@ const ProductsPage = {
             <option value="out_of_stock" ${this.state.stockStatusFilter === 'out_of_stock' ? 'selected' : ''}>🔴 Tükendi (0)</option>
           </select>
 
+          <select id="filter-web-status" class="filter-select">
+            <option value="Tümü" ${this.state.webStatusFilter === 'Tümü' ? 'selected' : ''}>Tüm Web Durumları</option>
+            <option value="active" ${this.state.webStatusFilter === 'active' ? 'selected' : ''}>🟢 Web'de Aktif</option>
+            <option value="passive" ${this.state.webStatusFilter === 'passive' ? 'selected' : ''}>🔴 Web'de Pasif</option>
+          </select>
+
           <select id="filter-sort" class="filter-select">
             <option value="default" ${this.state.sortOrder === 'default' ? 'selected' : ''}>Sıralama: Varsayılan</option>
             <option value="price_asc" ${this.state.sortOrder === 'price_asc' ? 'selected' : ''}>Fiyat: Düşükten Yükseğe</option>
@@ -396,7 +409,8 @@ const ProductsPage = {
       category: this.state.categoryFilter,
       season: this.state.seasonFilter,
       supplierId: this.state.supplierFilter,
-      stockStatus: this.state.stockStatusFilter
+      stockStatus: this.state.stockStatusFilter,
+      webStatus: this.state.webStatusFilter
     };
     return store.searchProducts(this.state.searchQuery, filters, this.state.sortOrder);
   },
@@ -473,6 +487,10 @@ const ProductsPage = {
                 <span class="badge" style="background:var(--bg-glass-hover); border:1px solid rgba(255,255,255,0.1); color:var(--text-secondary); font-size:0.6rem; padding: 2px 4px;">
                   ${esc(p.season || '-')}
                 </span>
+                ${p.web_visible === false 
+                  ? `<span class="badge" style="font-size:0.65rem; padding: 2px 6px; background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);" title="Web Sitesinde Pasif (Satışa Kapalı)">🌐 Web Pasif</span>`
+                  : `<span class="badge" style="font-size:0.65rem; padding: 2px 6px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);" title="Web Sitesinde Aktif (Satışta)">🌐 Web Aktif</span>`
+                }
             </div>
           </td>
           <td><span class="badge ${p.gender === 'Kadın' ? 'badge-pink' : 'badge-cyan'}">${esc(p.gender)}</span></td>
@@ -1021,6 +1039,18 @@ const ProductsPage = {
           </div>
         </div>
 
+        <!-- Web Sitesi Durumu -->
+        <div class="card" style="padding:14px;background:var(--bg-glass);margin-bottom:16px;">
+          <h4 style="margin-bottom:10px;font-size:0.92rem;color:var(--text-secondary);">🌐 Web Sitesi Durumu</h4>
+          <div class="form-group">
+            <select id="bulk-web-status" class="form-input">
+              <option value="__keep__">Mevcut Durumu Koru</option>
+              <option value="true">🟢 Web Sitesinde Aktif Yap (Satışta)</option>
+              <option value="false">🔴 Web Sitesinde Pasif Yap (Gizli)</option>
+            </select>
+          </div>
+        </div>
+
         <div class="modal-actions" style="margin-top:0;">
           <button type="button" class="btn btn-ghost btn-close-modal">İptal</button>
           <button type="submit" class="btn btn-primary">💾 ${count} Ürünü Güncelle</button>
@@ -1125,6 +1155,11 @@ const ProductsPage = {
       if (supplierId !== '__keep__') updates.supplierId = supplierId;
       if (gender !== '__keep__') updates.gender = gender;
 
+      const webStatus = content.querySelector('#bulk-web-status') ? content.querySelector('#bulk-web-status').value : '__keep__';
+      if (webStatus !== '__keep__') {
+        updates.web_visible = (webStatus === 'true');
+      }
+
       const updatedCount = store.bulkUpdateProducts(Array.from(this.state.selectedIds), updates);
       App.closeModal();
       this.clearSelection();
@@ -1223,12 +1258,21 @@ const ProductsPage = {
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="prod-barcode">Barkod (EAN-13 / QR)</label>
-          <div style="display:flex;gap:6px;">
-            <input type="text" id="prod-barcode" class="form-input" value="${esc(product ? product.barcode : '')}" placeholder="869..." style="flex:1;">
-            <button type="button" id="btn-generate-barcode" class="btn btn-secondary" style="padding:0 10px;" title="Otomatik Benzersiz Barkod Üret">🎲 Üret</button>
-            <button type="button" id="btn-scan-barcode-modal" class="btn btn-secondary" style="padding:0 10px;" title="Kameradan Tara">📷 Tara</button>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="prod-barcode">Barkod (EAN-13 / QR)</label>
+            <div style="display:flex;gap:6px;">
+              <input type="text" id="prod-barcode" class="form-input" value="${esc(product ? product.barcode : '')}" placeholder="869..." style="flex:1;">
+              <button type="button" id="btn-generate-barcode" class="btn btn-secondary" style="padding:0 10px;" title="Otomatik Benzersiz Barkod Üret">🎲 Üret</button>
+              <button type="button" id="btn-scan-barcode-modal" class="btn btn-secondary" style="padding:0 10px;" title="Kameradan Tara">📷 Tara</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="prod-web-status">Web Sitesi Durumu *</label>
+            <select id="prod-web-status" class="form-input" required>
+              <option value="true" ${(!product || product.web_visible !== false) ? 'selected' : ''}>🟢 Web'de Aktif (Sitede Satışta)</option>
+              <option value="false" ${product && product.web_visible === false ? 'selected' : ''}>🔴 Web'de Pasif (Sitede Gizli / Satışa Kapalı)</option>
+            </select>
           </div>
         </div>
 
@@ -1390,20 +1434,23 @@ const ProductsPage = {
     content.querySelector('#product-form').addEventListener('submit', (e) => {
       e.preventDefault();
 
+      const isWebVisible = content.querySelector('#prod-web-status') ? (content.querySelector('#prod-web-status').value === 'true') : true;
+
       const productData = {
         brand: content.querySelector('#prod-brand').value.trim(),
         model: content.querySelector('#prod-model').value.trim(),
-        gender: document.getElementById('prod-gender').value,
-        category: document.getElementById('prod-category').value,
-        season: document.getElementById('prod-season').value,
+        gender: content.querySelector('#prod-gender') ? content.querySelector('#prod-gender').value : document.getElementById('prod-gender').value,
+        category: content.querySelector('#prod-category') ? content.querySelector('#prod-category').value : document.getElementById('prod-category').value,
+        season: content.querySelector('#prod-season') ? content.querySelector('#prod-season').value : document.getElementById('prod-season').value,
         color: content.querySelector('#prod-color').value.trim(),
         price: parseFloat(content.querySelector('#prod-price').value),
         costPrice: content.querySelector('#product-cost-price').value ? parseFloat(content.querySelector('#product-cost-price').value) : 0,
         supplierId: content.querySelector('#prod-supplier').value,
         barcode: content.querySelector('#prod-barcode').value.trim(),
         stockCode: content.querySelector('#prod-stock-code') ? content.querySelector('#prod-stock-code').value.trim() : '',
+        web_visible: isWebVisible,
         image: imageArray.length > 0 ? imageArray[0] : null,
-          images: imageArray
+        images: imageArray
       };
 
       if (isEdit) {

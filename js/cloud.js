@@ -67,10 +67,14 @@ const CloudSync = {
 
         try {
           if (typeof firebase.appCheck === 'function') {
-            self.FIREBASE_APPCHECK_DEBUG_TOKEN = location.hostname === 'localhost';
+            const isLocal = ['localhost', '127.0.0.1'].includes(location.hostname);
+            if (isLocal) {
+              // Localhost için sabit debug token (Firebase Console > App Check > Debug Tokens alanına eklenmelidir)
+              self.FIREBASE_APPCHECK_DEBUG_TOKEN = '2574f9e5-b6d3-4626-a9af-0127296e952c';
+            }
             const appCheck = firebase.appCheck();
             appCheck.activate(new firebase.appCheck.ReCaptchaEnterpriseProvider('6Lcx2OEtAAAAAIVLFVvIrpJ4b4FzadcNOXWCI99p'), true);
-            console.log("App Check aktif (Admin Panel)");
+            console.log("App Check aktif (" + (isLocal ? "Localhost Sabit Debug Token" : "Canlı Ortam") + ")");
           }
         } catch(err) { console.error("App check hatasi", err); }
       }
@@ -84,7 +88,6 @@ const CloudSync = {
     }
 
     try {
-      this.db = firebase.database();
       this.db = firebase.database();
       this.updateStatus('syncing', 'Kimlik dogrulaniyor...');
       this.authenticate();
@@ -164,7 +167,15 @@ const CloudSync = {
       }
     }, (error) => {
       console.error("Bulut okuma hatasi:", error);
-      this.updateStatus('error', 'Senkronizasyon Hatasi');
+      this.authenticated = false;
+      if (error && error.message && error.message.includes('permission_denied')) {
+        this.updateStatus('error', 'Yetki Hatasi - Giris icin tiklayin');
+        if (typeof App !== 'undefined' && App.toast) {
+          App.toast('Veritabanina erisim izni verilmedi! Lutfen sistem@bayyildiz-stoktakip.com ile giris yapin.', 'error');
+        }
+      } else {
+        this.updateStatus('error', 'Senkronizasyon Hatasi - Tiklayin');
+      }
     });
   },
 
@@ -227,7 +238,7 @@ const CloudSync = {
       badgeContainer.title = 'Bulut Senkronizasyonu';
       badgeContainer.style.cursor = 'pointer';
       badgeContainer.addEventListener('click', () => {
-        if (!this.hasCredentials() || !this.authenticated) this.promptLogin();
+        this.promptLogin();
       });
       statusBar.appendChild(badgeContainer);
     }
@@ -238,22 +249,23 @@ const CloudSync = {
     if (typeof Auth !== 'undefined' && (Auth.isLocked || !Auth.currentUser)) return;
     if (typeof App === 'undefined' || !App.openModal) return;
 
+    const currentEmail = this.serviceAccount.email || 'sistem@bayyildiz-stoktakip.com';
     const html = `
       <form id="cloud-login-form" class="modal-form">
         <p class="text-muted" style="font-size:0.85rem;margin-bottom:12px;">
-          Bulut senkronizasyonu icin Firebase kullanici bilgilerini girin. Bilgiler yalnizca bu cihazda saklanir.
+          Bulut veritabanı okuma yetkisi için yetkili Firebase sistem hesabı e-postası (<strong>sistem@bayyildiz-stoktakip.com</strong>) ve şifresini girin.
         </p>
         <div class="form-group">
           <label class="form-label">E-posta</label>
-          <input type="email" id="cloud-login-email" class="form-input" required autocomplete="username">
+          <input type="email" id="cloud-login-email" class="form-input" required value="${esc(currentEmail)}" autocomplete="username">
         </div>
         <div class="form-group">
-          <label class="form-label">Sifre</label>
-          <input type="password" id="cloud-login-pass" class="form-input" required autocomplete="current-password">
+          <label class="form-label">Şifre</label>
+          <input type="password" id="cloud-login-pass" class="form-input" required autocomplete="current-password" placeholder="Şifrenizi girin">
         </div>
         <div class="modal-actions">
-          <button type="button" class="btn btn-ghost btn-close-modal">Iptal</button>
-          <button type="submit" class="btn btn-primary">Baglan</button>
+          <button type="button" class="btn btn-ghost btn-close-modal">İptal</button>
+          <button type="submit" class="btn btn-primary">Bağlan</button>
         </div>
       </form>
     `;

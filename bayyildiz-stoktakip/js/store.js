@@ -62,14 +62,17 @@ class ShoeStore {
         companyName: 'BAYYILDIZ Ayakkabı (1989)',
         website: 'https://bayyildiz.com',
         currency: '₺',
-        lowStockThreshold: 3,
+        lowStockThreshold: 2,
         sizes: {
+          'Erkek': [39, 40, 41, 42, 43, 44, 45, 46],
           'Kadın': [35, 36, 37, 38, 39, 40, 41],
-          'Erkek': [39, 40, 41, 42, 43, 44, 45, 46]
+          'Çocuk': [],
+          'Unisex': []
         },
-        seasons: ['4 Mevsim', 'Yaz', 'Kış', 'İlkbahar', 'Sonbahar'],
-        categories: ['Günlük', 'Klasik', 'Outdoor', 'Bot'],
-          managers: ['Ahmet', 'Ayşe', 'Mehmet']
+        genders: ['Erkek', 'Kadın', 'Çocuk', 'Unisex'],
+        seasons: ['Yaz', 'Kış', '4 Mevsim'],
+        categories: ['Spor Ayakkabı', 'Klasik', 'Bot', 'Sandalet', 'Terlik', 'Günlük'],
+        managers: ['Ahmet', 'Ayşe', 'Mehmet']
       }
     };
   }
@@ -246,8 +249,21 @@ class ShoeStore {
         }
       }
     }
-    // Kullanıcının isteği üzerine kategoriler sabitlendi
-    data.settings.categories = ['Günlük', 'Klasik', 'Outdoor', 'Bot'];
+    if (!Array.isArray(data.settings.categories) || data.settings.categories.length === 0) {
+      if (typeof data.settings.categories === 'object' && data.settings.categories !== null) {
+        data.settings.categories = Object.values(data.settings.categories);
+      } else {
+        data.settings.categories = ['Spor Ayakkabı', 'Klasik', 'Bot', 'Sandalet', 'Terlik', 'Günlük'];
+      }
+    }
+
+    if (!Array.isArray(data.settings.genders) || data.settings.genders.length === 0) {
+      if (typeof data.settings.genders === 'object' && data.settings.genders !== null) {
+        data.settings.genders = Object.values(data.settings.genders);
+      } else {
+        data.settings.genders = ['Erkek', 'Kadın', 'Çocuk', 'Unisex'];
+      }
+    }
 
     if (data.suppliers.length === 0) {
       data.suppliers = this.getDefaultSuppliers();
@@ -618,6 +634,7 @@ class ShoeStore {
       barcode: product.barcode || '',
       stockCode: calculatedStockCode,
       supplierId: product.supplierId || 'sup_bayyildiz',
+      web_visible: product.web_visible !== undefined ? !!product.web_visible : (product.isWebActive !== undefined ? !!product.isWebActive : true),
       image: product.image || null,
       images: product.images || [],
       createdAt: new Date().toISOString(),
@@ -783,6 +800,11 @@ class ShoeStore {
         });
       }
 
+      // Web Sitesi Görünürlük Güncellemesi
+      if (updates.web_visible !== undefined && updates.web_visible !== '__keep__') {
+        p.web_visible = updates.web_visible === true || updates.web_visible === 'true';
+      }
+
       p.updatedAt = new Date().toISOString();
     });
 
@@ -803,6 +825,14 @@ class ShoeStore {
     if (filters.season && filters.season !== 'all') results = results.filter(p => p.season === filters.season);
     if (filters.brand && filters.brand !== 'Tümü') results = results.filter(p => p.brand === filters.brand);
     if (filters.supplierId && filters.supplierId !== 'Tümü') results = results.filter(p => p.supplierId === filters.supplierId);
+
+    // Web Sitesi Durumu Filtresi
+    if (filters.webStatus && filters.webStatus !== 'Tümü') {
+      results = results.filter(p => {
+        const isWeb = p.web_visible !== false;
+        return filters.webStatus === 'active' ? isWeb : !isWeb;
+      });
+    }
 
     // Stok Durumu Filtresi
     if (filters.stockStatus && filters.stockStatus !== 'Tümü') {
@@ -1843,10 +1873,31 @@ class ShoeStore {
   }
 
   getSettings() {
+    if (!this.data.settings) this.data.settings = {};
     if (!this.data.settings.managers) {
       this.data.settings.managers = ['Ahmet', 'Ayşe', 'Mehmet'];
     } else if (!Array.isArray(this.data.settings.managers) && typeof this.data.settings.managers === 'object') {
       this.data.settings.managers = Object.values(this.data.settings.managers);
+    }
+    if (!Array.isArray(this.data.settings.categories) || !this.data.settings.categories.length) {
+      this.data.settings.categories = ['Spor Ayakkabı', 'Klasik', 'Bot', 'Sandalet', 'Terlik', 'Günlük'];
+    }
+    if (!Array.isArray(this.data.settings.genders) || !this.data.settings.genders.length) {
+      this.data.settings.genders = ['Erkek', 'Kadın', 'Çocuk', 'Unisex'];
+    }
+    if (!Array.isArray(this.data.settings.seasons) || !this.data.settings.seasons.length) {
+      this.data.settings.seasons = ['Yaz', 'Kış', '4 Mevsim'];
+    }
+    if (!this.data.settings.sizes || typeof this.data.settings.sizes !== 'object') {
+      this.data.settings.sizes = {
+        'Erkek': [39, 40, 41, 42, 43, 44, 45, 46],
+        'Kadın': [35, 36, 37, 38, 39, 40, 41],
+        'Çocuk': [],
+        'Unisex': []
+      };
+    }
+    if (this.data.settings.lowStockThreshold === undefined) {
+      this.data.settings.lowStockThreshold = 2;
     }
     return this.data.settings;
   }

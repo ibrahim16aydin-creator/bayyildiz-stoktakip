@@ -158,7 +158,7 @@ const App = {
       sales: 'Satışlar',
       reports: 'Raporlar',
       user: 'Güvenlik & Profil',
-      backup: 'Sistem Yedekleme',
+      backup: 'Veri Aktarımı',
       settings: 'Sistem Ayarları'
     };
     const mobileTitleEl = document.getElementById('mobile-page-title');
@@ -357,8 +357,6 @@ const App = {
 
   closeModal() {
     BarcodeScanner.stopScanner();
-    const mc = document.getElementById('modal-container');
-    if (mc) mc.style.maxWidth = '';
     document.getElementById('modal-overlay').classList.add('hidden');
   },
 

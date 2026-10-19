@@ -2651,267 +2651,222 @@ tr.row-selected {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ---- Veri Aktarımı Sayfası ---- */
+.transfer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
+}
+@media (max-width: 900px) {
+  .transfer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.transfer-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+.transfer-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.transfer-card-header h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+.transfer-dropzone {
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-md);
+  padding: 26px 16px;
+  text-align: center;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.02);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  user-select: none;
+}
+[data-theme="light"] .transfer-dropzone {
+  border-color: #d1d5db;
+  background: #f9fafb;
+  color: #4b5563;
+}
+.transfer-dropzone:hover, .transfer-dropzone.dragover {
+  border-color: var(--primary);
+  background: rgba(124, 58, 237, 0.08);
+  color: var(--primary);
+}
+.transfer-note-warn {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.83rem;
+  line-height: 1.45;
+}
+[data-theme="light"] .transfer-note-warn {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+.transfer-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+[data-theme="light"] .transfer-progress-bar {
+  background: #e5e7eb;
+}
+.transfer-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--cyan));
+  width: 0%;
+  transition: width 0.2s ease;
+}
+.transfer-report {
+  margin-top: 6px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #10b981;
+}
+.transfer-report.error {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: #ef4444;
+}
+
 /* ====================================================
-   MODERN BARKOD YAZDIRMA & CANLI ETİKET ÖNİZLEME
+   SETTINGS PAGE (AYARLAR)
    ==================================================== */
-.print-barcode-container {
+.settings-layout {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  max-width: 1000px;
+  margin: 0 auto;
 }
-
-.print-product-summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  background: var(--bg-glass);
+.settings-card {
+  background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  padding: 10px 14px;
-}
-.pps-info {
+  box-shadow: var(--shadow-sm);
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 14px;
 }
-.pps-title {
+.settings-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 12px;
+  margin-bottom: 2px;
+}
+.settings-card-head h3 {
+  font-size: 1.08rem;
   font-weight: 700;
-  font-size: 0.95rem;
   color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  margin: 0;
 }
-.pps-meta {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-.pps-barcode-badge {
-  font-family: monospace;
-  font-size: 0.85rem;
-  color: var(--cyan);
-  background: rgba(6, 182, 212, 0.1);
-  padding: 4px 10px;
-  border-radius: 6px;
-  border: 1px solid rgba(6, 182, 212, 0.25);
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.print-barcode-wrapper {
-  display: grid;
-  grid-template-columns: 1.15fr 0.95fr;
-  gap: 20px;
-  align-items: start;
-}
-
-@media (max-width: 720px) {
-  .print-barcode-wrapper {
-    grid-template-columns: 1fr;
-    gap: 18px;
-  }
-}
-
-.print-options-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  background: var(--bg-glass);
-  border: 1px solid var(--border-color);
-  padding: 10px 12px;
-  border-radius: var(--radius-md);
-  margin-bottom: 12px;
-}
-.print-option-check {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.82rem;
-  color: var(--text-secondary);
-  cursor: pointer;
-  user-select: none;
-}
-.print-option-check input[type="checkbox"] {
-  accent-color: var(--purple-light);
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-}
-
-.print-preview-pane {
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 16px;
+.settings-field {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  min-height: 240px;
-}
-[data-theme="light"] .print-preview-pane {
-  background: #f1f5f9;
-}
-
-.print-preview-header {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
-.print-preview-title {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  display: flex;
-  align-items: center;
   gap: 6px;
 }
-.print-preview-badge {
-  font-size: 0.72rem;
-  background: rgba(124, 58, 237, 0.15);
-  color: var(--purple-light);
-  border: 1px solid rgba(124, 58, 237, 0.3);
-  padding: 2px 8px;
-  border-radius: 12px;
+.settings-field > label,
+.settings-field > span {
+  font-size: 0.84rem;
   font-weight: 600;
+  color: var(--text-secondary);
 }
-
-.print-preview-viewport {
+.settings-field .req-dot {
+  color: #ef4444;
+  font-weight: bold;
+  margin-left: 3px;
+}
+.settings-input,
+.settings-field input,
+.settings-field textarea {
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 0 10px 0;
-  overflow: hidden;
-}
-
-/* Canlı Termal Etiket Çıkartması (Realistic Thermal Sticker Simulation) */
-.thermal-sticker-card {
-  background: #ffffff !important;
-  color: #000000 !important;
-  border-radius: 6px;
-  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.15);
-  padding: 8px 12px 8px 12px;
+  padding: 9px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  position: relative;
-  transition: all 0.2s ease;
-  user-select: none;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  overflow: hidden;
 }
-.thermal-sticker-card::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  border: 1px dashed rgba(0, 0, 0, 0.15);
-  border-radius: 6px;
-  pointer-events: none;
+[data-theme="light"] .settings-input,
+[data-theme="light"] .settings-field input,
+[data-theme="light"] .settings-field textarea {
+  background: #ffffff;
+  border-color: #d1d5db;
+  color: #111827;
 }
-
-/* Canlı Önizleme İç Detayları */
-.tsp-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #000;
-  padding-bottom: 2px;
-  margin-bottom: 3px;
-  line-height: 1.1;
+.settings-input:focus,
+.settings-field input:focus,
+.settings-field textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
 }
-.tsp-store {
-  font-weight: 900;
-  font-size: 8.5px;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
+.settings-field textarea {
+  resize: vertical;
+  line-height: 1.5;
+  font-family: inherit;
 }
-.tsp-brand {
-  font-weight: 800;
-  font-size: 8.5px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.settings-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
 }
-
-.tsp-model {
-  font-size: 11px;
-  font-weight: 800;
-  line-height: 1.15;
-  color: #000;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-top: 1px;
+@media (max-width: 640px) {
+  .settings-form-grid {
+    grid-template-columns: 1fr;
+  }
 }
-.tsp-details {
+.settings-op-summary {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 8px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 1px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-color);
+  gap: 12px;
+  flex-wrap: wrap;
 }
-
-.tsp-barcode-wrap {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 3px 0;
-  width: 100%;
+.settings-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
 }
-.tsp-barcode-wrap svg {
-  width: 100%;
-  max-height: 44px;
-  display: block;
-}
-
-.tsp-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  border-top: 1px solid #000;
-  padding-top: 3px;
-  margin-top: auto;
-}
-.tsp-size-badge {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 2px;
-  background: #000;
-  color: #fff;
-  padding: 1.5px 5px;
-  border-radius: 3px;
-  font-weight: 900;
-  line-height: 1.1;
-}
-.tsp-size-lbl {
-  font-size: 7px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-.tsp-size-val {
-  font-size: 11.5px;
-  font-weight: 900;
-}
-.tsp-price {
-  font-size: 13.5px;
-  font-weight: 900;
-  letter-spacing: -0.4px;
-  color: #000;
-  line-height: 1;
-}
-.tsp-note {
-  font-size: 7.5px;
-  font-style: italic;
-  color: #555;
-  text-align: center;
-  margin-top: 2px;
-  line-height: 1.1;
+@media (max-width: 768px) {
+  .settings-grid-2 {
+    grid-template-columns: 1fr;
+  }
 }
 
