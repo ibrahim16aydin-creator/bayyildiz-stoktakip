@@ -34,7 +34,7 @@ const ThemeManager = {
 
   _updateButtons(theme) {
     const isDark = theme === 'dark';
-    // Sidebar buton
+    // Topbar / Sidebar buton
     const icon = document.getElementById('theme-icon');
     const label = document.getElementById('theme-label');
     if (icon) icon.textContent = isDark ? '🌙' : '☀️';
@@ -146,23 +146,28 @@ const App = {
     document.querySelectorAll('.mob-nav-item').forEach(n => n.classList.remove('active'));
     document.querySelectorAll(`[data-page="${page}"]`).forEach(n => n.classList.add('active'));
 
-    // Mobil başlık
+    // Mobil ve üst bar başlık
     const titles = {
       dashboard: 'Dashboard',
       products: 'Ürünler',
       inventory: 'Stok',
       customers: 'Müşteriler',
+      'web-orders': 'Web Siparişleri',
       reviews: 'Müşteri Yorumları',
+      'web-settings': 'Site Ayarları',
       suppliers: 'Firmalar',
       transfer: 'Transfer',
       sales: 'Satışlar',
       reports: 'Raporlar',
+      expenses: 'Masraflar',
       user: 'Güvenlik & Profil',
       backup: 'Veri Aktarımı',
       settings: 'Sistem Ayarları'
     };
     const mobileTitleEl = document.getElementById('mobile-page-title');
     if (mobileTitleEl) mobileTitleEl.textContent = titles[page] || page;
+    const topbarTitleEl = document.getElementById('topbar-page-indicator');
+    if (topbarTitleEl) topbarTitleEl.textContent = titles[page] || page;
 
     // Sayfa render
     this.renderPage(page);
@@ -405,8 +410,6 @@ const App = {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    // Bildirim metni ürün/müşteri adı gibi kullanıcı verisi taşıyabildiğinden
-    // burada merkezi olarak kaçışa alınır; çağrı yerlerinde ek kaçış gerekmez.
     toast.innerHTML = `<span class="toast-icon">${icons[type] || icons.info}</span><span>${esc(message)}</span>`;
     container.appendChild(toast);
 
@@ -422,11 +425,12 @@ const App = {
   },
 
   // ---- Satır içi onclick işleyicilerinin yerine ----
-  // index.html'deki onclick öznitelikleri kaldırılarak CSP'den
-  // 'unsafe-inline' izni çıkarılabilir hale getirildi.
   bindInlineActions() {
     const btnLogout = document.getElementById('btn-logout');
     if (btnLogout) btnLogout.addEventListener('click', () => Auth.lock());
+
+    const btnLogoutMobile = document.getElementById('mobile-logout-btn');
+    if (btnLogoutMobile) btnLogoutMobile.addEventListener('click', () => Auth.lock());
 
     const btnTheme = document.getElementById('btn-theme-toggle');
     if (btnTheme) btnTheme.addEventListener('click', () => ThemeManager.toggle());
@@ -447,7 +451,6 @@ const App = {
   },
 
   // ---- Yardımcı: Ürün <select> listesine marka / model / barkod arama kutusu ekler ----
-  // Liste filtrelenir; seçili ürün değişirse select üzerinde 'change' olayı tetiklenir.
   attachProductSearch(selectEl) {
     if (!selectEl || selectEl.dataset.searchAttached) return;
     selectEl.dataset.searchAttached = '1';

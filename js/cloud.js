@@ -1,5 +1,5 @@
-﻿// ==========================================
-// BAYYILDIZ Ayakkabi Ã¢â‚¬â€ Firebase Bulut Senkronizasyonu
+// ==========================================
+// BAYYILDIZ Ayakkabi — Firebase Bulut Senkronizasyonu
 // Firebase Auth ile arka planda sessiz kimlik dogrulama
 // ==========================================
 
@@ -189,7 +189,7 @@ const CloudSync = {
       this.updateStatus('syncing', 'Buluta Yaziliyor...');
       this.ignoreNextChange = true;
 
-      // OlasÃ„Â± 'undefined' alanlarÃ„Â±n Firebase set() metodunu kÃ„Â±rmasÃ„Â±nÃ„Â± ÃƒÂ¶nlemek iÃƒÂ§in gÃƒÂ¼venli kopya oluÃ…Å¸tur
+      // Olası 'undefined' alanların Firebase set() metodunu kırmasını önlemek için güvenli kopya oluştur
       const safeData = JSON.parse(JSON.stringify(dataObj));
       // Site ayarlari kendi yolunda (webSettings) yonetilir; stok verisiyle ezilmesin.
       delete safeData.webSettings;
@@ -217,9 +217,9 @@ const CloudSync = {
     if (state === 'offline') {
       html = `<span class="badge" style="background:var(--bg-card); color:var(--text-muted); border: 1px solid var(--border-color);">&#9729; ${text}</span>`;
     } else if (state === 'online') {
-      html = `<span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2);">&#9729; ${text}</span>`;
+      html = `<span class="badge" style="background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.28);">&#9729; ${text}</span>`;
     } else if (state === 'syncing') {
-      html = `<span class="badge" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); animation: pulse 1.5s infinite">&#128260; ${text}</span>`;
+      html = `<span class="badge" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.28); animation: pulse 1.5s infinite">&#128260; ${text}</span>`;
     } else if (state === 'error') {
       html = `<span class="badge badge-danger">&#9888; ${text}</span>`;
     }
@@ -228,19 +228,24 @@ const CloudSync = {
   },
 
   renderBadge() {
-    // Sidebar icindeki duruma ekle
-    const statusBar = document.querySelector('.sidebar-status-bar');
-    if (statusBar && !document.getElementById('cloud-status-badge')) {
-      const badgeContainer = document.createElement('div');
-      badgeContainer.id = 'cloud-status-badge';
-      badgeContainer.style.marginTop = '8px';
-      badgeContainer.style.display = 'inline-block';
+    let badgeContainer = document.getElementById('cloud-status-badge');
+    if (!badgeContainer) {
+      const statusBar = document.querySelector('.sidebar-status-bar');
+      if (statusBar) {
+        badgeContainer = document.createElement('div');
+        badgeContainer.id = 'cloud-status-badge';
+        statusBar.appendChild(badgeContainer);
+      }
+    }
+    if (badgeContainer && !badgeContainer.dataset.bound) {
+      badgeContainer.dataset.bound = '1';
+      badgeContainer.style.display = 'inline-flex';
+      badgeContainer.style.alignItems = 'center';
       badgeContainer.title = 'Bulut Senkronizasyonu';
       badgeContainer.style.cursor = 'pointer';
       badgeContainer.addEventListener('click', () => {
         this.promptLogin();
       });
-      statusBar.appendChild(badgeContainer);
     }
   },
 
@@ -285,9 +290,7 @@ const CloudSync = {
     });
   },
 
-  // Ayarlar ekranÃ„Â±ndaki kontrollerle uyumlu olmasÃ„Â± iÃƒÂ§in mock fonksiyonlar (geri alÃ„Â±ndÃ„Â±Ã„Å¸Ã„Â± iÃƒÂ§in)
   hasCredentials() {
     return !!(this.serviceAccount.email && this.serviceAccount.password);
   }
 };
-

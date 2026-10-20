@@ -546,8 +546,16 @@ const Auth = {
       </div>
     `;
 
-    if (userBadge) userBadge.innerHTML = html;
-    if (userBadgeMobile) userBadgeMobile.innerHTML = html;
+    if (userBadge) {
+      userBadge.innerHTML = html;
+      userBadge.style.cursor = 'pointer';
+      userBadge.onclick = () => this.lock();
+    }
+    if (userBadgeMobile) {
+      userBadgeMobile.innerHTML = html;
+      userBadgeMobile.style.cursor = 'pointer';
+      userBadgeMobile.onclick = () => this.lock();
+    }
 
     // Yedekleme ekranı yalnızca yöneticiye gösterilir. Bu yalnızca görsel bir
     // düzenlemedir; asıl engelleme App.navigateTo içindeki yetki kontrolüdür.
