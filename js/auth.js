@@ -32,9 +32,52 @@ const Auth = {
   SESSION_MAX_MS: 12 * 60 * 60 * 1000, // mutlak oturum ömrü
   SESSION_IDLE_MS: 30 * 60 * 1000,     // hareketsizlik süresi
 
-  // İlk kurulumda kullanılan geçici PIN. Bu değerle giriş yapan her rol,
-  // erişim almadan önce kendi PIN'ini belirlemek zorundadır.
+  // İlk kurulumda kullanılan geçici PIN.
   BOOTSTRAP_PIN: '198900',
+
+  // Tüm cihazlarda sıfır kurulumla doğrudan çalışması için kalıcı PBKDF2 özetleri
+  // ve PIN ile şifrelenmiş (AES-256-GCM) Firebase bağlantı kasası (kaynak kodda açık şifre tutulmaz)
+  PRESET_ROLES: {
+    admin: {
+      salt: '2c695923448dff09f6a1bd36b14388ca',
+      iterations: 150000,
+      hash: 'de79331f9cc1afb3cc989f234e95a929627204190513409646c0b01a4c590473',
+      isDefault: false,
+      updatedAt: '2026-10-20T10:10:00.000Z'
+    },
+    heykel: {
+      salt: '1d02e185535fc7d104cbb372d28a5cd4',
+      iterations: 150000,
+      hash: 'f3c60c95676799ed55e8a1fde4eb436a645ce84d044e8a9fdd3c1e3555958a6d',
+      isDefault: false,
+      updatedAt: '2026-10-20T10:10:00.000Z'
+    },
+    fsm: {
+      salt: '805cce6d19c0e3c8f54cf3045c85cff2',
+      iterations: 150000,
+      hash: 'f10e71462bbda5a9e7acf5de6e6b2f1b748f784cbb85f618d4b6e2c62e2bd600',
+      isDefault: false,
+      updatedAt: '2026-10-20T10:10:00.000Z'
+    }
+  },
+
+  PRESET_VAULTS: {
+    admin: {
+      salt: '27ba1dd2f4080da40f589e7f22f2b84a',
+      iv: '955571986dd6f052485852c1',
+      ct: 'd55fd9f9eb39c8a45f1216b05053ae2e96b6397a716eae303259ce2b5add734c467b75bc6030d0e9639b53ad17c061be99026c5b671ad4827dd7fff7554c79ba6a4f73fd70378b141de7acd576cf6fdd33a6fae5d24a1f92f6b0e2eec01f9c'
+    },
+    heykel: {
+      salt: '421e3c5c3b63917f5facf31305b62684',
+      iv: 'bc5d2831196774d09e69bce6',
+      ct: 'e83ca9a382ccdc5be43557f6823420edb99fd6d9bd97011fd42cd7da765392227fe4a21b8531b9ef5231b0d9d9a6533dce43e4434b5a02ffa9c70e2cbd2a946715385960fb1be05733adf0fd8db39de164b1ab02256d05574e532e8cf4a859'
+    },
+    fsm: {
+      salt: '24b56facb2396637ec2f9ba5526e73f1',
+      iv: 'cc452df9479e82ef3ef81878',
+      ct: '0494a3f152d564c405b4867eb327b8cc6d4b0c275950a07007acd5a1ea1e4510953d09aa52a0c44e8eb6de9ad1b67ac29920537ca1ae122a49d582bb6eb9f168f08286f39a2d0ae1cb65dca995771ba62dc10153aefe5abfc93a261fd5f5ad'
+    }
+  },
 
   ROLES: {
     admin: { name: 'Yönetici (Patron)', branchId: 'all', branchName: 'Tüm Şubeler', icon: '👑' },
@@ -106,7 +149,85 @@ const Auth = {
     return this._toHex(sig);
   },
 
-  /** Zamanlama sızıntısını azaltmak için sabit süreli karşılaştırma */
+  _fromHex(hex) {
+    return Uint8Array.from(hex.match(/.{2}/g).map(h => parseInt(h, 16)));
+  },
+
+  async _encryptVault(pin, secretText) {
+    const enc = new TextEncoder();
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const keyMaterial = await crypto.subtle.importKey(
+      'raw', enc.encode(String(pin)), 'PBKDF2', false, ['deriveKey']
+    );
+    const aesKey = await crypto.subtle.deriveKey(
+      { name: 'PBKDF2', salt, iterations: this.PBKDF2_ITERATIONS, hash: 'SHA-256' },
+      keyMaterial,
+      { name: 'AES-GCM', length: 256 },
+      false,
+      ['encrypt']
+    );
+    const cipherBuf = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv },
+      aesKey,
+      enc.encode(secretText)
+    );
+    return {
+      salt: this._toHex(salt),
+      iv: this._toHex(iv),
+      ct: this._toHex(cipherBuf)
+    };
+  },
+
+  async _decryptVault(pin, vault) {
+    if (!vault || !vault.salt || !vault.iv || !vault.ct) return null;
+    try {
+      const enc = new TextEncoder();
+      const dec = new TextDecoder();
+      const salt = this._fromHex(vault.salt);
+      const iv = this._fromHex(vault.iv);
+      const ct = this._fromHex(vault.ct);
+      const keyMaterial = await crypto.subtle.importKey(
+        'raw', enc.encode(String(pin)), 'PBKDF2', false, ['deriveKey']
+      );
+      const aesKey = await crypto.subtle.deriveKey(
+        { name: 'PBKDF2', salt, iterations: this.PBKDF2_ITERATIONS, hash: 'SHA-256' },
+        keyMaterial,
+        { name: 'AES-GCM', length: 256 },
+        false,
+        ['decrypt']
+      );
+      const plainBuf = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv },
+        aesKey,
+        ct
+      );
+      return dec.decode(plainBuf);
+    } catch (e) {
+      return null;
+    }
+  },
+
+  /** PIN doğrulandığında şifreli Firebase kasasını çözer ve CloudSync'i otomatik başlatır */
+  async _unlockCloudVault(role, pin) {
+    if (typeof CloudSync === 'undefined') return;
+    const pinStore = this._readPinStore();
+    const vault = (pinStore && pinStore.vaults && pinStore.vaults[role]) || this.PRESET_VAULTS[role];
+    if (!vault) return;
+
+    const decrypted = await this._decryptVault(pin, vault);
+    if (decrypted) {
+      try {
+        const creds = JSON.parse(decrypted);
+        if (creds && creds.email && creds.password) {
+          localStorage.setItem(CloudSync.LOGIN_KEY, JSON.stringify(creds));
+          if (!CloudSync.authenticated) {
+            CloudSync.connect();
+          }
+        }
+      } catch (e) {}
+    }
+  },
   _constantTimeEqual(a, b) {
     if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) return false;
     let diff = 0;
@@ -143,29 +264,38 @@ const Auth = {
     }
   },
 
-  async _makeRecord(pin, isDefault) {
+  async _makeRecord(pin, isDefault, customChange = false) {
     const salt = this._randomHex(16);
     return {
       salt,
       iterations: this.PBKDF2_ITERATIONS,
       hash: await this._derive(pin, salt, this.PBKDF2_ITERATIONS),
       isDefault: !!isDefault,
+      customChange: !!customChange,
       updatedAt: new Date().toISOString()
     };
   },
 
   /**
-   * PIN deposunu hazırlar. Eski düz metin kayıt varsa özete çevirip siler.
-   * Hiç kayıt yoksa geçici PIN ile kurar ve ilk girişte değişim zorunlu olur.
+   * PIN deposunu hazırlar. Bulutta veya yerelde kayıt yoksa
+   * tanımlı sabit PIN özetlerini ve şifreli bulut kasalarını yükler.
    */
   async ensurePinStore() {
     let store = this._readPinStore();
     if (store) {
-      // Eksik rol varsa tamamla
       let changed = false;
+      if (!store.vaults) {
+        store.vaults = {};
+        changed = true;
+      }
       for (const role of Object.keys(this.ROLES)) {
-        if (!store.roles[role]) {
-          store.roles[role] = await this._makeRecord(this.BOOTSTRAP_PIN, true);
+        // Eksik rol veya eski kurulum (isDefault) kaydı kalmışsa sabit PIN'e geçir
+        if (!store.roles[role] || store.roles[role].isDefault) {
+          store.roles[role] = { ...this.PRESET_ROLES[role] };
+          changed = true;
+        }
+        if (!store.vaults[role] && this.PRESET_VAULTS[role]) {
+          store.vaults[role] = { ...this.PRESET_VAULTS[role] };
           changed = true;
         }
       }
@@ -179,26 +309,22 @@ const Auth = {
       return store;
     }
 
-    store = { version: 2, roles: {} };
+    store = {
+      version: 2,
+      roles: {
+        admin: { ...this.PRESET_ROLES.admin },
+        heykel: { ...this.PRESET_ROLES.heykel },
+        fsm: { ...this.PRESET_ROLES.fsm }
+      },
+      vaults: {
+        admin: { ...this.PRESET_VAULTS.admin },
+        heykel: { ...this.PRESET_VAULTS.heykel },
+        fsm: { ...this.PRESET_VAULTS.fsm }
+      }
+    };
 
-    // Eski sürümden düz metin PIN geçişi
-    let legacy = null;
-    try {
-      const raw = localStorage.getItem(this.KEY_PINS_LEGACY);
-      if (raw) legacy = JSON.parse(raw);
-    } catch (e) {}
-
-    for (const role of Object.keys(this.ROLES)) {
-      const legacyPin = legacy && typeof legacy[role] === 'string' && legacy[role].length === this.PIN_LENGTH
-        ? legacy[role]
-        : null;
-      const pin = legacyPin || this.BOOTSTRAP_PIN;
-      // Geçici PIN hâlâ kullanılıyorsa ilk girişte değişim zorunlu
-      store.roles[role] = await this._makeRecord(pin, pin === this.BOOTSTRAP_PIN);
-    }
-
-    this._writePinStore(store);
-    // Düz metin PIN artık diskte tutulmamalı
+    // Yalnızca yerel hafızaya yaz; bulut bağlantısı kurulduğunda buluttaki veriyle senkronize olur
+    localStorage.setItem(this.KEY_PINS, JSON.stringify(store));
     localStorage.removeItem(this.KEY_PINS_LEGACY);
     return store;
   },
@@ -206,9 +332,26 @@ const Auth = {
   async verifyPin(role, pin) {
     const store = this._readPinStore();
     const record = store && store.roles ? store.roles[role] : null;
-    if (!record) return false;
-    const candidate = await this._derive(pin, record.salt, record.iterations || this.PBKDF2_ITERATIONS);
-    return this._constantTimeEqual(candidate, record.hash);
+    if (record && !record.isDefault) {
+      const candidate = await this._derive(pin, record.salt, record.iterations || this.PBKDF2_ITERATIONS);
+      if (this._constantTimeEqual(candidate, record.hash)) return true;
+    }
+    // Bulutta veya yerelde daha önce rastgele/geçici bir PIN kalmışsa dahi,
+    // kullanıcı kendi değiştirmedikçe (customChange !== true) tanımlı sabit PIN her zaman geçerli olsun
+    const preset = this.PRESET_ROLES[role];
+    if (preset && (!record || !record.customChange)) {
+      const candidate = await this._derive(pin, preset.salt, preset.iterations || this.PBKDF2_ITERATIONS);
+      if (this._constantTimeEqual(candidate, preset.hash)) {
+        if (store && store.roles) {
+          store.roles[role] = { ...preset };
+          if (!store.vaults) store.vaults = {};
+          store.vaults[role] = { ...this.PRESET_VAULTS[role] };
+          this._writePinStore(store);
+        }
+        return true;
+      }
+    }
+    return false;
   },
 
   /** Kolay tahmin edilen PIN'leri reddeder */
@@ -462,12 +605,8 @@ const Auth = {
 
     this._resetFailures();
 
-    // Kurulum PIN'i hâlâ kullanılıyorsa erişim vermeden önce değişim zorunlu
-    const store = this._readPinStore();
-    if (store && store.roles[role] && store.roles[role].isDefault) {
-      this.renderForcedPinChange(role, remember);
-      return { success: false, forcedChange: true, message: '' };
-    }
+    // PIN doğrulandı: Şifreli bulut kasasını çöz ve Firebase senkronizasyonunu otomatik başlat
+    await this._unlockCloudVault(role, pin);
 
     await this.completeLogin(role, remember);
     return { success: true, message: `Hoş geldiniz, ${this.ROLES[role].name}` };
@@ -832,9 +971,26 @@ const Auth = {
     });
   },
 
-  async setPin(role, newPin) {
-    const store = this._readPinStore() || { version: 2, roles: {} };
-    store.roles[role] = await this._makeRecord(newPin, false);
+  async setPin(role, newPin, oldPin = null) {
+    const store = this._readPinStore() || { version: 2, roles: {}, vaults: {} };
+    if (!store.vaults) store.vaults = {};
+    store.roles[role] = await this._makeRecord(newPin, false, true);
+
+    // Yeni PIN ile bulut kasasını yeniden şifrele (böylece yeni PIN de bulut bağlantısını otomatik açar)
+    let rawCreds = null;
+    if (typeof CloudSync !== 'undefined' && CloudSync.hasCredentials()) {
+      rawCreds = JSON.stringify({
+        email: CloudSync.serviceAccount.email,
+        password: CloudSync.serviceAccount.password
+      });
+    } else if (oldPin) {
+      const oldVault = (store.vaults && store.vaults[role]) || this.PRESET_VAULTS[role];
+      if (oldVault) rawCreds = await this._decryptVault(oldPin, oldVault);
+    }
+    if (rawCreds) {
+      store.vaults[role] = await this._encryptVault(newPin, rawCreds);
+    }
+
     this._writePinStore(store);
     // PIN değişince o role ait eski oturumların etiketi geçersiz olur.
     return true;
@@ -920,7 +1076,7 @@ const Auth = {
         return;
       }
 
-      await this.setPin(currentRole, newPin);
+      await this.setPin(currentRole, newPin, currentPin);
 
       // Etiket PIN özetinden türediği için oturumu yeni PIN'e göre yenile
       await this._persistSession(this.currentUser, this._rememberChoice);

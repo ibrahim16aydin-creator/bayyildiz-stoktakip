@@ -283,6 +283,11 @@ class ShoeStore {
     // Site ayarları (webSettings) kendi yolunda yönetilir; stok verisine karıştırılmaz
     delete result.data.webSettings;
     this.data = result.data;
+    if (this.data.authStore && this.data.authStore.version === 2) {
+      try {
+        localStorage.setItem('bayyildiz_auth_pins_v2', JSON.stringify(this.data.authStore));
+      } catch (e) {}
+    }
     this.saveData(this.data);
     return true;
   }
