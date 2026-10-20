@@ -409,7 +409,7 @@ const Auth = {
   /** Kilitlendiğinde ekranda veri kalmasını önler */
   clearRenderedPages() {
     document.querySelectorAll('#main-content .page').forEach(p => { p.innerHTML = ''; });
-    ['auth-user-badge', 'auth-user-badge-mobile'].forEach(id => {
+    ['auth-user-badge', 'auth-user-badge-mobile', 'auth-user-badge-sidebar'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.innerHTML = '';
     });
@@ -536,6 +536,7 @@ const Auth = {
   updateUserUI() {
     const userBadge = document.getElementById('auth-user-badge');
     const userBadgeMobile = document.getElementById('auth-user-badge-mobile');
+    const userBadgeSidebar = document.getElementById('auth-user-badge-sidebar');
 
     if (!this.currentUser) return;
 
@@ -546,15 +547,27 @@ const Auth = {
       </div>
     `;
 
+    const mobileHtml = `
+      <div class="user-role-pill" style="padding: 4px 8px; font-size: 0.72rem;" title="Oturum: ${esc(this.currentUser.name)} (Tıklayarak Kilitle)">
+        <span>${esc(this.currentUser.icon)}</span>
+        <span class="user-name">${esc(this.currentUser.role === 'admin' ? 'Yönetici' : (this.currentUser.role === 'heykel' ? 'Heykel' : 'FSM'))}</span>
+      </div>
+    `;
+
     if (userBadge) {
       userBadge.innerHTML = html;
       userBadge.style.cursor = 'pointer';
       userBadge.onclick = () => this.lock();
     }
     if (userBadgeMobile) {
-      userBadgeMobile.innerHTML = html;
+      userBadgeMobile.innerHTML = mobileHtml;
       userBadgeMobile.style.cursor = 'pointer';
       userBadgeMobile.onclick = () => this.lock();
+    }
+    if (userBadgeSidebar) {
+      userBadgeSidebar.innerHTML = html;
+      userBadgeSidebar.style.cursor = 'pointer';
+      userBadgeSidebar.onclick = () => this.lock();
     }
 
     // Yedekleme ekranı yalnızca yöneticiye gösterilir. Bu yalnızca görsel bir

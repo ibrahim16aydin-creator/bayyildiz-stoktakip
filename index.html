@@ -33,6 +33,12 @@
       </div>
     </div>
 
+    <!-- Mobil çekmece (drawer) görünümünde durum rozetleri -->
+    <div class="sidebar-mobile-status">
+      <div id="cloud-status-badge-sidebar" class="cloud-status-trigger" title="Bulut Senkronizasyonu"></div>
+      <div id="auth-user-badge-sidebar"></div>
+    </div>
+
     <nav class="sidebar-nav">
       <!-- Grup: Stok Takip -->
       <div class="nav-group-title">Stok Takip</div>
@@ -135,6 +141,7 @@
       <span id="mobile-page-title" class="text-muted" style="font-size:0.82rem;">Dashboard</span>
     </div>
     <div style="display:flex;align-items:center;gap:6px;">
+      <div id="cloud-status-badge-mobile" class="cloud-status-trigger" title="Bulut Senkronizasyonu"></div>
       <div id="auth-user-badge-mobile"></div>
       <button id="mobile-theme-btn" class="mobile-theme-toggle" title="Tema Değiştir" aria-label="Tema Değiştir">
         <span id="mobile-theme-icon">🌙</span>
@@ -147,6 +154,7 @@
 
   <!-- ====== MOBILE ACTIONS DROPDOWN ====== -->
   <div id="mobile-actions-dropdown" class="mobile-dropdown hidden">
+    <button data-action="cloud-login">☁️ Bulut Bağlantısı</button>
     <button data-action="scan">📷 Barkod Tara</button>
     <button data-page="user">🔒 Güvenlik</button>
     <button data-page="backup">💾 Yedekleme</button>

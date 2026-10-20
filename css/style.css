@@ -346,6 +346,10 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
   border-bottom: 1px solid var(--border-color);
 }
 
+.sidebar-mobile-status {
+  display: none;
+}
+
 .brand-logo-img {
   height: 44px;
   width: auto;
@@ -1434,6 +1438,20 @@ select option {
 @media (max-width: 768px) {
   .desktop-topbar {
     display: none !important;
+  }
+
+  .sidebar-mobile-status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border-color);
+    background: rgba(0, 0, 0, 0.15);
+  }
+
+  [data-theme="light"] .sidebar-mobile-status {
+    background: rgba(124, 58, 237, 0.04);
   }
 
   #sidebar {

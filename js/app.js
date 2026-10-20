@@ -225,7 +225,9 @@ const App = {
       dropdown.querySelectorAll('button').forEach(btn => {
         btn.addEventListener('click', () => {
           const action = btn.dataset.action;
-          if (action === 'scan') BarcodeScanner.openScanner((code) => {
+          if (action === 'cloud-login') {
+            if (typeof CloudSync !== 'undefined') CloudSync.promptLogin();
+          } else if (action === 'scan') BarcodeScanner.openScanner((code) => {
             const product = store.getProductByBarcode(code);
             if (product) {
               this.navigateTo('sales');

@@ -212,19 +212,28 @@ const CloudSync = {
   
   updateStatus(state, text) {
     const badge = document.getElementById('cloud-status-badge');
+    const badgeSidebar = document.getElementById('cloud-status-badge-sidebar');
+    const badgeMobile = document.getElementById('cloud-status-badge-mobile');
     
     let html = '';
+    let mobileHtml = '';
     if (state === 'offline') {
       html = `<span class="badge" style="background:var(--bg-card); color:var(--text-muted); border: 1px solid var(--border-color);">&#9729; ${text}</span>`;
+      mobileHtml = `<span class="badge" style="background:rgba(245, 158, 11, 0.14); color:#f59e0b; border: 1px solid rgba(245, 158, 11, 0.35); padding:4px 8px; font-size:0.72rem;">&#9729; Bağlan</span>`;
     } else if (state === 'online') {
       html = `<span class="badge" style="background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.28);">&#9729; ${text}</span>`;
+      mobileHtml = `<span class="badge" style="background: rgba(16, 185, 129, 0.14); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.32); padding:4px 8px; font-size:0.72rem;" title="${text}">&#9729;</span>`;
     } else if (state === 'syncing') {
       html = `<span class="badge" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.28); animation: pulse 1.5s infinite">&#128260; ${text}</span>`;
+      mobileHtml = `<span class="badge" style="background: rgba(245, 158, 11, 0.14); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.32); padding:4px 8px; font-size:0.72rem; animation: pulse 1.5s infinite">&#128260;</span>`;
     } else if (state === 'error') {
       html = `<span class="badge badge-danger">&#9888; ${text}</span>`;
+      mobileHtml = `<span class="badge badge-danger" style="padding:4px 8px; font-size:0.72rem;">&#9888; Bağlan</span>`;
     }
 
     if (badge) badge.innerHTML = html;
+    if (badgeSidebar) badgeSidebar.innerHTML = html;
+    if (badgeMobile) badgeMobile.innerHTML = mobileHtml;
   },
 
   renderBadge() {
@@ -237,16 +246,20 @@ const CloudSync = {
         statusBar.appendChild(badgeContainer);
       }
     }
-    if (badgeContainer && !badgeContainer.dataset.bound) {
-      badgeContainer.dataset.bound = '1';
-      badgeContainer.style.display = 'inline-flex';
-      badgeContainer.style.alignItems = 'center';
-      badgeContainer.title = 'Bulut Senkronizasyonu';
-      badgeContainer.style.cursor = 'pointer';
-      badgeContainer.addEventListener('click', () => {
-        this.promptLogin();
-      });
-    }
+
+    ['cloud-status-badge', 'cloud-status-badge-sidebar', 'cloud-status-badge-mobile'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && !el.dataset.bound) {
+        el.dataset.bound = '1';
+        el.style.display = 'inline-flex';
+        el.style.alignItems = 'center';
+        el.title = 'Bulut Senkronizasyonu (Tıklayarak Giriş Yap)';
+        el.style.cursor = 'pointer';
+        el.addEventListener('click', () => {
+          this.promptLogin();
+        });
+      }
+    });
   },
 
   /** Bu cihaz icin bulut giris bilgisini ister (kaynak kodda saklanmaz) */

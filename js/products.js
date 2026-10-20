@@ -612,7 +612,7 @@ const ProductsPage = {
     }
   },
 
-  // ---- Barkod Yazdırma (Modern & Yüksek Okunabilirlik) ----
+  // ---- Barkod Yazdırma ----
   printBarcode(productId) {
     const product = store.getProduct(productId);
     if (!product) return;
@@ -624,256 +624,63 @@ const ProductsPage = {
 
     const sizes = store.data.settings.sizes[product.gender] || [];
 
-    // Modalı ferah çalışma alanı için genişlet
-    const modalContainer = document.getElementById('modal-container');
-    if (modalContainer) {
-      modalContainer.style.maxWidth = '780px';
-    }
-
     const content = document.createElement('div');
-    content.className = 'print-barcode-container';
     content.innerHTML = `
-      <div class="print-product-summary">
-        <div class="pps-info">
-          <div class="pps-title">
-            <span>${esc(product.brand || 'BAYYILDIZ')} ${esc(product.model)}</span>
-            <span class="badge badge-purple" style="font-size:0.72rem;padding:2px 6px;">${esc(product.category || 'Ürün')}</span>
+      <form id="print-barcode-form" class="modal-form">
+        <div class="form-group">
+          <label>Şablon / Boyut Seçimi</label>
+          <select id="print-template" class="form-input" required>
+            <option value="50x30">Standart Rulo (50mm x 30mm)</option>
+            <option value="40x20">Mini Rulo (40mm x 20mm)</option>
+            <option value="40x60">Özel Rulo (40mm x 60mm)</option>
+            <option value="60x40">Büyük Rulo (60mm x 40mm)</option>
+            <option value="A4">A4 Yaprak (63.5mm x 38.1mm, 3 Sütun)</option>
+            <option value="custom">Serbest Boyut Girin...</option>
+          </select>
+        </div>
+        <div id="custom-size-inputs" style="display:none; gap:10px; margin-bottom:15px;">
+          <div style="flex:1;">
+            <label>Genişlik (mm)</label>
+            <input type="number" id="custom-width" class="form-input" min="10" max="200" value="50">
           </div>
-          <div class="pps-meta">
-            ${esc(product.color || 'Renk Belirtilmemiş')}${product.stockCode ? ' • SK: ' + esc(product.stockCode) : ''} • Fiyat: <strong style="color:var(--text-primary);">${store.formatCurrency(product.price)}</strong>
+          <div style="flex:1;">
+            <label>Yükseklik (mm)</label>
+            <input type="number" id="custom-height" class="form-input" min="10" max="200" value="50">
           </div>
         </div>
-        <div class="pps-barcode-badge">
-          🔢 ${esc(product.barcode)}
+        <div class="form-group">
+          <label>Hangi numara için etiket basılacak?</label>
+          <select id="print-size" class="form-input" required>
+            ${sizes.map(s => `<option value="${esc(s)}">${esc(s)} Numara</option>`).join('')}
+            <option value="custom">Özel Numara Girin...</option>
+          </select>
         </div>
-      </div>
-
-      <div class="print-barcode-wrapper">
-        <!-- Sol Kolon: Ayarlar & Seçimler -->
-        <form id="print-barcode-form" class="modal-form" style="display:flex;flex-direction:column;gap:12px;">
-          <div class="form-group" style="margin:0;">
-            <label style="font-weight:600;font-size:0.83rem;margin-bottom:4px;display:block;">Şablon / Boyut Seçimi</label>
-            <select id="print-template" class="form-input" required>
-              <option value="50x30" selected>Standart Rulo (50mm x 30mm) — En Yaygın</option>
-              <option value="60x40">Büyük Rulo (60mm x 40mm) — Geniş Alan</option>
-              <option value="40x60">Dikey Rulo (40mm x 60mm) — Kart Formatı</option>
-              <option value="40x20">Mini Rulo (40mm x 20mm) — Kompakt</option>
-              <option value="A4">A4 Yaprak (63.5mm x 38.1mm, 3 Sütun)</option>
-              <option value="custom">Özel Boyut Girin (mm)...</option>
-            </select>
-          </div>
-
-          <div id="custom-size-inputs" style="display:none; gap:10px; margin:0;">
-            <div style="flex:1;">
-              <label style="font-size:0.8rem;">Genişlik (mm)</label>
-              <input type="number" id="custom-width" class="form-input" min="15" max="200" value="50">
-            </div>
-            <div style="flex:1;">
-              <label style="font-size:0.8rem;">Yükseklik (mm)</label>
-              <input type="number" id="custom-height" class="form-input" min="15" max="200" value="30">
-            </div>
-          </div>
-
-          <div class="form-group" style="margin:0;">
-            <label style="font-weight:600;font-size:0.83rem;margin-bottom:4px;display:block;">Hangi numara için etiket basılacak?</label>
-            <select id="print-size" class="form-input" required>
-              ${sizes.length > 0 ? `<option value="__ALL__">🌟 Tüm Bedenler (Her numaradan bas)</option>` : ''}
-              ${sizes.map((s, idx) => `<option value="${esc(s)}" ${idx === 0 ? 'selected' : ''}>${esc(s)} Numara</option>`).join('')}
-              <option value="custom">Özel Numara Girin...</option>
-            </select>
-          </div>
-
-          <div class="form-group" id="custom-size-input-group" style="display:none; margin:0;">
-            <label style="font-size:0.8rem;">Özel Numara Metni</label>
-            <input type="text" id="custom-print-size" class="form-input" placeholder="Örn: 42.5 veya Tek Beden">
-          </div>
-
-          <div class="form-group" style="margin:0;">
-            <label style="font-weight:600;font-size:0.83rem;margin-bottom:4px;display:block;">Barkod Altı / Ek Bilgi Notu (İsteğe Bağlı)</label>
-            <input type="text" id="custom-print-note" class="form-input" placeholder="Örn: Dana Derisi, Ortopedik Taban, İade 14 Gün">
-          </div>
-
-          <!-- Baskı Detay Seçenekleri -->
-          <div class="print-options-grid">
-            <label class="print-option-check">
-              <input type="checkbox" id="print-opt-store" checked>
-              <span>Mağaza Adı (BAYYILDIZ)</span>
-            </label>
-            <label class="print-option-check">
-              <input type="checkbox" id="print-opt-price" checked>
-              <span>Fiyat Yazılsın</span>
-            </label>
-            <label class="print-option-check">
-              <input type="checkbox" id="print-opt-meta" checked>
-              <span>Renk & Kod Yazılsın</span>
-            </label>
-            <label class="print-option-check">
-              <input type="checkbox" id="print-opt-crisp" checked>
-              <span>Yüksek Kontrast (Net Bar)</span>
-            </label>
-          </div>
-
-          <div class="form-group" style="margin:0;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-              <label style="font-weight:600;font-size:0.83rem;margin:0;">Kaç adet basılacak?</label>
-              <span id="print-total-calc" style="font-size:0.75rem;color:var(--cyan);font-weight:600;">1 Adet Basılacak</span>
-            </div>
-            <input type="number" id="print-count" class="form-input" min="1" max="500" value="1" required>
-          </div>
-
-          <div class="modal-actions" style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border-color);">
-            <button type="button" class="btn btn-ghost btn-close-modal">İptal</button>
-            <button type="submit" class="btn btn-primary" style="display:flex;align-items:center;gap:6px;">
-              <span>🖨️ Yazdır</span>
-            </button>
-          </div>
-        </form>
-
-        <!-- Sağ Kolon: Canlı Etiket Önizleme -->
-        <div class="print-preview-pane">
-          <div class="print-preview-header">
-            <span class="print-preview-title">
-              <span>🏷️ Canlı Önizleme</span>
-            </span>
-            <span id="preview-dimension-badge" class="print-preview-badge">50 x 30 mm</span>
-          </div>
-
-          <div class="print-preview-viewport">
-            <div id="live-thermal-sticker" class="thermal-sticker-card" style="width:260px;min-height:156px;">
-              <!-- İçerik Dinamik Olarak Güncellenir -->
-            </div>
-          </div>
-          <div style="font-size:0.7rem;color:var(--text-muted);text-align:center;margin-top:6px;">
-            💡 Termal yazıcı çıktınız bu netlik ve düzende basılacaktır.
-          </div>
+        <div class="form-group" id="custom-size-input-group" style="display:none;">
+          <label>Özel Numara</label>
+          <input type="text" id="custom-print-size" class="form-input" placeholder="Örn: 42.5 veya Tek Beden">
         </div>
-      </div>
+        <div class="form-group">
+          <label>Barkod Altı Bilgi Notu (İsteğe Bağlı)</label>
+          <input type="text" id="custom-print-note" class="form-input" placeholder="Örn: Dana Derisinden Üretilmiştir.">
+        </div>
+        <div class="form-group">
+          <label>Kaç adet basılacak?</label>
+          <input type="number" id="print-count" class="form-input" min="1" max="1000" value="1" required>
+        </div>
+        <div class="modal-actions" style="margin-top: 24px;">
+          <button type="button" class="btn btn-ghost btn-close-modal">İptal</button>
+          <button type="submit" class="btn btn-primary">🖨️ Yazdır</button>
+        </div>
+      </form>
     `;
 
-    // Önizlemeyi Güncelleyen Fonksiyon
-    const updatePreview = () => {
-      const template = content.querySelector('#print-template').value;
-      let sizeVal = content.querySelector('#print-size').value;
-      if (sizeVal === 'custom') {
-        sizeVal = content.querySelector('#custom-print-size').value.trim() || '42';
-      } else if (sizeVal === '__ALL__') {
-        sizeVal = sizes[0] || '39';
-      }
-      const noteVal = content.querySelector('#custom-print-note').value.trim();
-      const showStore = content.querySelector('#print-opt-store').checked;
-      const showPrice = content.querySelector('#print-opt-price').checked;
-      const showMeta = content.querySelector('#print-opt-meta').checked;
-      const countVal = parseInt(content.querySelector('#print-count').value, 10) || 1;
-
-      // Adet hesaplaması
-      const totalCalcEl = content.querySelector('#print-total-calc');
-      const isAllSizes = content.querySelector('#print-size').value === '__ALL__';
-      if (isAllSizes) {
-        const total = (sizes.length || 1) * countVal;
-        totalCalcEl.textContent = `Tüm Bedenler: Toplam ${total} Adet Basılacak`;
-      } else {
-        totalCalcEl.textContent = `Toplam ${countVal} Adet Basılacak`;
-      }
-
-      // Şablon Boyut Rozeti ve Kutu En-Boy Oranı
-      const sticker = content.querySelector('#live-thermal-sticker');
-      const badge = content.querySelector('#preview-dimension-badge');
-      if (template === '50x30') {
-        badge.textContent = '50 x 30 mm (Yatay)';
-        sticker.style.width = '260px';
-        sticker.style.minHeight = '156px';
-      } else if (template === '60x40') {
-        badge.textContent = '60 x 40 mm (Geniş)';
-        sticker.style.width = '270px';
-        sticker.style.minHeight = '180px';
-      } else if (template === '40x60') {
-        badge.textContent = '40 x 60 mm (Dikey)';
-        sticker.style.width = '190px';
-        sticker.style.minHeight = '285px';
-      } else if (template === '40x20') {
-        badge.textContent = '40 x 20 mm (Mini)';
-        sticker.style.width = '260px';
-        sticker.style.minHeight = '130px';
-      } else if (template === 'A4') {
-        badge.textContent = 'A4 Yaprak (63.5 x 38.1 mm)';
-        sticker.style.width = '260px';
-        sticker.style.minHeight = '156px';
-      } else {
-        const w = parseInt(content.querySelector('#custom-width').value, 10) || 50;
-        const h = parseInt(content.querySelector('#custom-height').value, 10) || 30;
-        badge.textContent = `${w} x ${h} mm (Özel)`;
-        const baseW = 240;
-        const calcH = Math.max(120, Math.round((h / w) * baseW));
-        sticker.style.width = `${baseW}px`;
-        sticker.style.minHeight = `${calcH}px`;
-      }
-
-      // Önizleme HTML Şablonu
-      sticker.innerHTML = `
-        <div class="tsp-header">
-          <span class="tsp-store">${showStore ? 'BAYYILDIZ' : ''}</span>
-          <span class="tsp-brand">${esc(product.brand || 'BAYYILDIZ')}</span>
-        </div>
-        <div class="tsp-body">
-          <div class="tsp-model">${esc(product.model)}</div>
-          ${showMeta ? `
-            <div class="tsp-details">
-              <span>${esc(product.color || '')}${product.stockCode ? ' • ' + esc(product.stockCode) : ''}</span>
-              ${noteVal ? `<span style="font-style:italic;color:#666;">${esc(noteVal)}</span>` : ''}
-            </div>` : ''}
-        </div>
-        <div class="tsp-barcode-wrap">
-          <svg id="preview-barcode-svg"></svg>
-        </div>
-        <div class="tsp-footer">
-          <div class="tsp-size-badge">
-            <span class="tsp-size-lbl">NO:</span>
-            <span class="tsp-size-val">${esc(sizeVal)}${isAllSizes ? '★' : ''}</span>
-          </div>
-          ${showPrice ? `<div class="tsp-price">${store.formatCurrency(product.price)}</div>` : ''}
-        </div>
-        ${noteVal && !showMeta ? `<div class="tsp-note">${esc(noteVal)}</div>` : ''}
-      `;
-
-      // JsBarcode ile önizlemeyi çiz
-      const svgEl = sticker.querySelector('#preview-barcode-svg');
-      if (svgEl && typeof JsBarcode !== 'undefined') {
-        const cleanCode = (product.barcode || '').toString().trim();
-        const isEan13 = /^\d{13}$/.test(cleanCode);
-        const bWidth = template === '40x20' ? 1.2 : 1.4;
-        const bHeight = template === '40x20' ? 24 : template === '40x60' ? 42 : 32;
-        try {
-          JsBarcode(svgEl, cleanCode, {
-            format: isEan13 ? "EAN13" : "CODE128",
-            width: bWidth,
-            height: bHeight,
-            displayValue: true,
-            fontSize: 10,
-            font: "monospace",
-            fontOptions: "bold",
-            textMargin: 1,
-            margin: 0
-          });
-        } catch (e) {
-          try {
-            JsBarcode(svgEl, cleanCode, {
-              format: "CODE128",
-              width: bWidth,
-              height: bHeight,
-              displayValue: true,
-              fontSize: 10,
-              margin: 0
-            });
-          } catch(err) {}
-        }
-      }
-    };
-
-    // Dinleyicileri Bağla
     content.querySelector('#print-template').addEventListener('change', (e) => {
       const customInputs = content.querySelector('#custom-size-inputs');
-      customInputs.style.display = (e.target.value === 'custom') ? 'flex' : 'none';
-      updatePreview();
+      if (e.target.value === 'custom') {
+        customInputs.style.display = 'flex';
+      } else {
+        customInputs.style.display = 'none';
+      }
     });
 
     content.querySelector('#print-size').addEventListener('change', (e) => {
@@ -885,384 +692,215 @@ const ProductsPage = {
         customSizeGroup.style.display = 'none';
         content.querySelector('#custom-print-size').removeAttribute('required');
       }
-      updatePreview();
     });
 
-    content.querySelector('#custom-print-size').addEventListener('input', updatePreview);
-    content.querySelector('#custom-print-note').addEventListener('input', updatePreview);
-    content.querySelector('#print-opt-store').addEventListener('change', updatePreview);
-    content.querySelector('#print-opt-price').addEventListener('change', updatePreview);
-    content.querySelector('#print-opt-meta').addEventListener('change', updatePreview);
-    content.querySelector('#print-count').addEventListener('input', updatePreview);
-    content.querySelector('#custom-width').addEventListener('input', updatePreview);
-    content.querySelector('#custom-height').addEventListener('input', updatePreview);
-
-    // Form Gönderildiğinde Yazdırma Ekranını Aç
     content.querySelector('#print-barcode-form').addEventListener('submit', (e) => {
       e.preventDefault();
       const template = content.querySelector('#print-template').value;
-      let sizeVal = content.querySelector('#print-size').value;
-      if (sizeVal === 'custom') {
-        sizeVal = content.querySelector('#custom-print-size').value.trim() || 'Standart';
+      let size = content.querySelector('#print-size').value;
+      if (size === 'custom') {
+        size = content.querySelector('#custom-print-size').value;
       }
-      const count = parseInt(content.querySelector('#print-count').value, 10) || 1;
+      const count = parseInt(content.querySelector('#print-count').value, 10);
       const note = content.querySelector('#custom-print-note').value.trim();
-      let customW = 50, customH = 30;
+      let customW = 50, customH = 50;
       if (template === 'custom') {
         customW = parseInt(content.querySelector('#custom-width').value, 10) || 50;
-        customH = parseInt(content.querySelector('#custom-height').value, 10) || 30;
+        customH = parseInt(content.querySelector('#custom-height').value, 10) || 50;
       }
-      const options = {
-        showStore: content.querySelector('#print-opt-store').checked,
-        showPrice: content.querySelector('#print-opt-price').checked,
-        showMeta: content.querySelector('#print-opt-meta').checked,
-        highContrast: content.querySelector('#print-opt-crisp').checked
-      };
-
       App.closeModal();
-      this.openPrintWindow(product, sizeVal, count, template, customW, customH, note, options);
+      this.openPrintWindow(product, size, count, template, customW, customH, note);
     });
 
     App.openModal('Barkod Etiketi Yazdır', content);
-    // İlk render
-    setTimeout(updatePreview, 50);
   },
 
-  // ---- Termal Yazıcı İçin Modern Etiket Oluşturma ve Baskı Penceresi ----
-  openPrintWindow(product, sizeInput, count, template = '50x30', customW = 50, customH = 30, note = '', options = {}) {
-    const printWindow = window.open('', '_blank', 'width=880,height=680');
+  openPrintWindow(product, size, count, template = '50x30', customW = 50, customH = 50, note = '') {
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
     if (!printWindow) {
-      App.toast('Açılır pencere engelleyicisi yazdırma ekranını durdurdu. Lütfen tarayıcı ayarlarından izin verin.', 'error');
+      App.toast('Açılır pencere engelleyicisi yazdırma ekranını durdurdu. Lütfen izin verin.', 'error');
       return;
     }
 
-    const showStore = options.showStore !== false;
-    const showPrice = options.showPrice !== false;
-    const showMeta = options.showMeta !== false;
-
-    // Eğer Tüm Bedenler seçildiyse ilgili bedenlerin listesini al
-    const settingsSizes = store.data.settings.sizes[product.gender] || [];
-    let sizeList = [];
-    if (sizeInput === '__ALL__') {
-      sizeList = settingsSizes.length > 0 ? settingsSizes : ['Standart'];
-    } else {
-      sizeList = [sizeInput];
-    }
-
-    const isA4 = template === 'A4';
     let labelsHTML = '';
-    let totalLabelCount = 0;
-
+    const isA4 = template === 'A4';
     if (isA4) labelsHTML += '<div class="a4-sheet">';
 
-    // Her numara için belirtilen adette etiket üret
-    sizeList.forEach(currentSize => {
-      for (let i = 0; i < count; i++) {
-        totalLabelCount++;
-        const labelIdx = totalLabelCount;
-
-        if (template === '40x60') {
-          // Dikey 40mm x 60mm Şablon
-          labelsHTML += `
-            <div class="label-page modern-40x60">
-              ${showStore ? `<div class="lbl-store-header">BAYYILDIZ</div>` : ''}
-              <div class="lbl-brand-row">${esc(product.brand || 'BAYYILDIZ')}</div>
-              <div class="lbl-model-title">${esc(product.model)}</div>
-              ${showMeta ? `<div class="lbl-color-sub">${esc(product.color || '')}${product.stockCode ? ' • ' + esc(product.stockCode) : ''}</div>` : ''}
-              
-              <div class="lbl-size-badge-center">
-                <span class="size-lbl">NO:</span>
-                <span class="size-val">${esc(currentSize)}</span>
-              </div>
-
-              <div class="lbl-barcode-container">
-                <svg class="barcode-svg" id="barcode-${labelIdx}"></svg>
-              </div>
-
-              ${showPrice ? `
-                <div class="lbl-price-box">
-                  <span class="price-val">${store.formatCurrency(product.price)}</span>
-                </div>` : ''}
-              ${note ? `<div class="lbl-note-text">${esc(note)}</div>` : ''}
-            </div>
-          `;
-        } else if (template === '40x20') {
-          // Mini 40mm x 20mm Şablon
-          labelsHTML += `
-            <div class="label-page modern-40x20">
-              <div class="lbl-header-mini">
-                <span class="store-mini">${showStore ? 'BAYYILDIZ' : ''}</span>
-                <span class="brand-mini">${esc(product.brand || '')}</span>
-              </div>
-              <div class="lbl-model-mini">${esc(product.model)}</div>
-              <div class="lbl-barcode-container-mini">
-                <svg class="barcode-svg" id="barcode-${labelIdx}"></svg>
-              </div>
-              <div class="lbl-footer-mini">
-                <div class="size-mini">NO: ${esc(currentSize)}</div>
-                ${showPrice ? `<div class="price-mini">${store.formatCurrency(product.price)}</div>` : ''}
+    for (let i = 0; i < count; i++) {
+      if (isA4) {
+        labelsHTML += `
+          <div class="label-page">
+            <div class="product-name">${esc(product.model)}</div>
+            <div class="product-meta">${esc(product.color)} - ${esc(size)}</div>
+            <div class="price">${store.formatCurrency(product.price)}</div>
+            <svg class="barcode-svg" id="barcode-${i}"></svg>
+            ${note ? `<div class="product-note">${esc(note)}</div>` : ''}
+          </div>
+        `;
+      } else if (template === '40x60') {
+        labelsHTML += `
+          <div class="label-page modern-40x60">
+            <div class="header">BAYYILDIZ</div>
+            <div class="product-info">
+              <div class="brand">${esc(product.brand || '')}</div>
+              <div class="model">${esc(product.model)}</div>
+              <div class="details">
+                <span class="color">${esc(product.color)}</span>
+                <span class="size-badge">${esc(size)}</span>
               </div>
             </div>
-          `;
-        } else if (template === '60x40') {
-          // Büyük 60mm x 40mm Şablon
-          labelsHTML += `
-            <div class="label-page modern-60x40">
-              <div class="lbl-header-row">
-                <span class="lbl-store-name">${showStore ? 'BAYYILDIZ AYAKKABI' : ''}</span>
-                <span class="lbl-brand-name">${esc(product.brand || 'BAYYILDIZ')}</span>
-              </div>
-              <div class="lbl-model-row">
-                <div class="lbl-model-name">${esc(product.model)}</div>
-              </div>
-              ${showMeta ? `
-                <div class="lbl-meta-row">
-                  <span class="lbl-color-text">${esc(product.color || '')}${product.stockCode ? ' • SK: ' + esc(product.stockCode) : ''}</span>
-                  ${note ? `<span class="lbl-note-badge">${esc(note)}</span>` : ''}
-                </div>` : ''}
-              <div class="lbl-barcode-box">
-                <svg class="barcode-svg" id="barcode-${labelIdx}"></svg>
-              </div>
-              <div class="lbl-footer-row">
-                <div class="lbl-size-badge-modern">
-                  <span class="size-title">NUMARA:</span>
-                  <span class="size-number">${esc(currentSize)}</span>
+            <div class="barcode-container">
+              <svg class="barcode-svg" id="barcode-${i}"></svg>
+            </div>
+            <div class="price-box">
+              <div class="price">${store.formatCurrency(product.price)}</div>
+            </div>
+            ${note ? `<div class="note">${esc(note)}</div>` : ''}
+          </div>
+        `;
+      } else if (template === '60x40') {
+        labelsHTML += `
+          <div class="label-page modern-60x40">
+            <div class="header">BAYYILDIZ</div>
+            <div class="main-content">
+              <div class="info-left">
+                <div class="brand">${esc(product.brand || '')}</div>
+                <div class="model">${esc(product.model)}</div>
+                <div class="details">
+                  <span class="color">${esc(product.color)}</span>
+                  <span class="size-badge">${esc(size)}</span>
                 </div>
-                ${showPrice ? `<div class="lbl-price-modern">${store.formatCurrency(product.price)}</div>` : ''}
+                <div class="price">${store.formatCurrency(product.price)}</div>
+              </div>
+              <div class="barcode-right">
+                <svg class="barcode-svg" id="barcode-${i}"></svg>
               </div>
             </div>
-          `;
-        } else if (isA4) {
-          // A4 Yaprak Etiket (63.5 x 38.1mm)
-          labelsHTML += `
-            <div class="label-page a4-cell-label">
-              <div class="lbl-header-row">
-                <span class="lbl-store-name">${showStore ? 'BAYYILDIZ' : ''}</span>
-                <span class="lbl-brand-name">${esc(product.brand || 'BAYYILDIZ')}</span>
-              </div>
-              <div class="lbl-model-row">
-                <div class="lbl-model-name">${esc(product.model)}</div>
-              </div>
-              ${showMeta ? `
-                <div class="lbl-meta-row">
-                  <span class="lbl-color-text">${esc(product.color || '')}${product.stockCode ? ' • ' + esc(product.stockCode) : ''}</span>
-                  ${note ? `<span class="lbl-note-badge">${esc(note)}</span>` : ''}
-                </div>` : ''}
-              <div class="lbl-barcode-box">
-                <svg class="barcode-svg" id="barcode-${labelIdx}"></svg>
-              </div>
-              <div class="lbl-footer-row">
-                <div class="lbl-size-badge-modern">
-                  <span class="size-title">NO:</span>
-                  <span class="size-number">${esc(currentSize)}</span>
-                </div>
-                ${showPrice ? `<div class="lbl-price-modern">${store.formatCurrency(product.price)}</div>` : ''}
-              </div>
-            </div>
-          `;
-        } else {
-          // Standart 50mm x 30mm ve Custom Şablon
-          labelsHTML += `
-            <div class="label-page modern-50x30">
-              <div class="lbl-header-row">
-                <span class="lbl-store-name">${showStore ? 'BAYYILDIZ' : ''}</span>
-                <span class="lbl-brand-name">${esc(product.brand || 'BAYYILDIZ')}</span>
-              </div>
-              <div class="lbl-model-row">
-                <div class="lbl-model-name">${esc(product.model)}</div>
-              </div>
-              ${showMeta ? `
-                <div class="lbl-meta-row">
-                  <span class="lbl-color-text">${esc(product.color || '')}${product.stockCode ? ' • ' + esc(product.stockCode) : ''}</span>
-                  ${note ? `<span class="lbl-note-badge">${esc(note)}</span>` : ''}
-                </div>` : ''}
-              <div class="lbl-barcode-box">
-                <svg class="barcode-svg" id="barcode-${labelIdx}"></svg>
-              </div>
-              <div class="lbl-footer-row">
-                <div class="lbl-size-badge-modern">
-                  <span class="size-title">NO:</span>
-                  <span class="size-number">${esc(currentSize)}</span>
-                </div>
-                ${showPrice ? `<div class="lbl-price-modern">${store.formatCurrency(product.price)}</div>` : ''}
-              </div>
-            </div>
-          `;
-        }
+            ${note ? `<div class="note">${esc(note)}</div>` : ''}
+          </div>
+        `;
+      } else {
+        labelsHTML += `
+          <div class="label-page">
+            <div class="product-name">${esc(product.model)}</div>
+            <div class="product-meta">${esc(product.color)} - ${esc(size)}</div>
+            <div class="price">${store.formatCurrency(product.price)}</div>
+            <svg class="barcode-svg" id="barcode-${i}"></svg>
+            ${note ? `<div class="product-note">${esc(note)}</div>` : ''}
+          </div>
+        `;
       }
-    });
-
+    }
+    
     if (isA4) labelsHTML += '</div>';
 
-    // Şablona Özel CSS ve Boyut Ayarları
     let css = '';
-    let barcodeWidth = 1.35;
-    let barcodeHeight = 28;
-    let barcodeFontSize = 10;
+    let barcodeHeight = 40;
+    let barcodeFontSize = 14;
 
     switch (template) {
       case '40x20':
-        barcodeWidth = 1.15;
-        barcodeHeight = 18;
-        barcodeFontSize = 8.5;
+        barcodeHeight = 25;
+        barcodeFontSize = 10;
         css = `
           @page { size: 40mm 20mm; margin: 0; }
-          .modern-40x20 {
-            width: 40mm; height: 20mm; padding: 1mm 1.5mm; box-sizing: border-box;
+          .label-page {
+            width: 40mm; height: 20mm; padding: 1mm; box-sizing: border-box;
             page-break-after: always; display: flex; flex-direction: column;
-            justify-content: space-between; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif;
-            color: #000; background: #fff;
+            align-items: center; justify-content: center; overflow: hidden;
           }
-          .modern-40x20:last-child { page-break-after: auto; }
-          .lbl-header-mini { display: flex; justify-content: space-between; font-size: 6pt; font-weight: 800; border-bottom: 0.5pt solid #000; padding-bottom: 0.5px; }
-          .lbl-model-mini { font-size: 7.5pt; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.1; margin: 0.5px 0; }
-          .lbl-barcode-container-mini { display: flex; justify-content: center; align-items: center; width: 100%; margin: 0; }
-          .lbl-barcode-container-mini svg { width: 100%; height: 7mm; display: block; }
-          .lbl-footer-mini { display: flex; justify-content: space-between; align-items: center; border-top: 0.5pt solid #000; padding-top: 0.5px; }
-          .size-mini { font-size: 7.5pt; font-weight: 900; background: #000; color: #fff; padding: 0.5px 3px; border-radius: 1.5px; }
-          .price-mini { font-size: 8.5pt; font-weight: 900; }
+          .label-page:last-child { page-break-after: auto; }
+          .company-name { font-size: 6px; font-weight: 800; margin-bottom: 1px; text-transform: uppercase; }
+          .product-name { font-size: 8px; font-weight: 700; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 1px; }
+          .product-meta { font-size: 9px; font-weight: 900; margin-bottom: 1px; }
+          .price { font-size: 10px; font-weight: 900; margin-bottom: 1px; }
+          .barcode-svg { max-width: 100%; height: 7mm; display: block; margin: 0 auto; }
         `;
         break;
-
       case '40x60':
-        barcodeWidth = 1.35;
-        barcodeHeight = 44;
-        barcodeFontSize = 11;
-        css = `
-          @page { size: 40mm 60mm; margin: 0; }
-          .modern-40x60 {
-            width: 40mm; height: 60mm; padding: 3mm 2.5mm; box-sizing: border-box;
-            page-break-after: always; display: flex; flex-direction: column;
-            justify-content: space-between; align-items: center; text-align: center; overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif; color: #000; background: #fff;
-          }
-          .modern-40x60:last-child { page-break-after: auto; }
-          .lbl-store-header { font-size: 8pt; font-weight: 900; letter-spacing: 1px; border-bottom: 1px solid #000; padding-bottom: 1.5px; width: 100%; }
-          .lbl-brand-row { font-size: 8.5pt; font-weight: 800; text-transform: uppercase; margin-top: 2px; }
-          .lbl-model-title { font-size: 10pt; font-weight: 900; line-height: 1.15; margin: 2px 0; }
-          .lbl-color-sub { font-size: 7.5pt; font-weight: 600; color: #333; margin-bottom: 2px; }
-          .lbl-size-badge-center { display: inline-flex; align-items: baseline; gap: 3px; background: #000; color: #fff; padding: 2px 8px; border-radius: 3px; font-weight: 900; margin: 2px 0; }
-          .lbl-size-badge-center .size-lbl { font-size: 7pt; font-weight: 700; }
-          .lbl-size-badge-center .size-val { font-size: 13pt; font-weight: 900; }
-          .lbl-barcode-container { display: flex; justify-content: center; width: 100%; margin: 3px 0; }
-          .lbl-barcode-container svg { width: 100%; height: 16mm; display: block; }
-          .lbl-price-box { border: 1.5px solid #000; padding: 2px 8px; border-radius: 4px; width: 85%; }
-          .lbl-price-box .price-val { font-size: 14pt; font-weight: 900; letter-spacing: -0.4px; }
-          .lbl-note-text { font-size: 7.5pt; font-style: italic; color: #444; margin-top: 2px; }
-        `;
-        break;
-
+      
       case '60x40':
-        barcodeWidth = 1.5;
-        barcodeHeight = 36;
-        barcodeFontSize = 12;
+        barcodeHeight = 55;
+        barcodeFontSize = 14;
         css = `
           @page { size: 60mm 40mm; margin: 0; }
           .modern-60x40 {
-            width: 60mm; height: 40mm; padding: 2.2mm 3mm; box-sizing: border-box;
-            page-break-after: always; display: flex; flex-direction: column;
-            justify-content: space-between; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif;
-            color: #000; background: #fff;
+            width: 60mm; height: 40mm; box-sizing: border-box;
+            padding: 3mm; page-break-after: always; display: flex; flex-direction: column;
+            justify-content: space-between; overflow: hidden;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+            background: #fff; color: #000;
           }
           .modern-60x40:last-child { page-break-after: auto; }
-          .lbl-header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1.2px solid #000; padding-bottom: 1.5px; font-size: 8pt; font-weight: 900; letter-spacing: 0.5px; }
-          .lbl-model-row { margin-top: 1.5px; }
-          .lbl-model-name { font-size: 10.5pt; font-weight: 900; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-          .lbl-meta-row { display: flex; justify-content: space-between; align-items: center; font-size: 7.5pt; font-weight: 600; color: #333; line-height: 1.1; }
-          .lbl-note-badge { font-style: italic; color: #555; }
-          .lbl-barcode-box { display: flex; justify-content: center; align-items: center; margin: 1mm 0; width: 100%; }
-          .lbl-barcode-box svg { width: 100%; max-height: 14mm; display: block; }
-          .lbl-footer-row { display: flex; justify-content: space-between; align-items: flex-end; border-top: 1.2px solid #000; padding-top: 2px; margin-top: auto; }
-          .lbl-size-badge-modern { display: inline-flex; align-items: baseline; gap: 3px; background: #000; color: #fff; padding: 2px 7px; border-radius: 3px; font-weight: 900; }
-          .lbl-size-badge-modern .size-title { font-size: 7.5pt; font-weight: 700; }
-          .lbl-size-badge-modern .size-number { font-size: 13pt; font-weight: 900; }
-          .lbl-price-modern { font-size: 14.5pt; font-weight: 900; letter-spacing: -0.4px; line-height: 1; }
+          .modern-60x40 .header { font-size: 8px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 2px; margin-bottom: 2px; width: 100%; text-align: center; }
+          .modern-60x40 .main-content { display: flex; flex-direction: row; align-items: center; justify-content: space-between; flex: 1; width: 100%; gap: 2mm; }
+          .modern-60x40 .info-left { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; flex: 1; min-width: 0; }
+          .modern-60x40 .brand { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8; margin-bottom: 1px; }
+          .modern-60x40 .model { font-size: 11px; font-weight: 800; line-height: 1.1; margin-bottom: 3px; display:-webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow:hidden; }
+          .modern-60x40 .details { display: flex; align-items: center; justify-content: flex-start; gap: 4px; margin-bottom: 4px; }
+          .modern-60x40 .color { font-size: 9px; font-weight: 600; }
+          .modern-60x40 .size-badge { font-size: 11px; font-weight: 900; background: #000; color: #fff; padding: 1px 4px; border-radius: 2px; }
+          .modern-60x40 .price { font-size: 18px; font-weight: 900; letter-spacing: -0.5px; margin-top: auto; }
+          .modern-60x40 .barcode-right { display: flex; align-items: center; justify-content: flex-end; }
+          .modern-60x40 .barcode-svg { width: 30mm; height: 18mm; display: block; }
+          .modern-60x40 .note { font-size: 8px; font-weight: 500; font-style: italic; opacity: 0.7; text-align: center; margin-top: 1px; width: 100%; }
         `;
         break;
-
+      case 'custom':
+        barcodeHeight = customH > 40 ? 40 : 25;
+        barcodeFontSize = customW > 40 ? 14 : 10;
+        css = `
+          @page { size: ${customW}mm ${customH}mm; margin: 0; }
+          .label-page {
+            width: ${customW}mm; height: ${customH}mm; padding: 2mm; box-sizing: border-box;
+            page-break-after: always; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; overflow: hidden; text-align: center;
+          }
+          .label-page:last-child { page-break-after: auto; }
+          .product-note { font-size: 8px; font-weight: 500; margin-top: 2px; text-transform: none; text-align: center; }
+          .product-name { font-size: 11px; font-weight: 700; max-width: 100%; white-space: normal; line-height: 1.1; display:-webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow:hidden; margin-bottom: 2px; }
+          .product-meta { font-size: 11px; font-weight: 900; margin-bottom: 2px; }
+          .price { font-size: 13px; font-weight: 900; margin-bottom: 4px; }
+          .barcode-svg { max-width: 100%; height: ${customH > 40 ? '12mm' : '7mm'}; display: block; margin: 0 auto; }
+        `;
+        break;
       case 'A4':
-        barcodeWidth = 1.45;
-        barcodeHeight = 32;
-        barcodeFontSize = 11;
+        barcodeHeight = 40;
+        barcodeFontSize = 12;
         css = `
           @page { size: A4; margin: 10mm; }
           .a4-sheet {
-            display: grid; grid-template-columns: repeat(3, 63.5mm);
-            gap: 2.5mm 3mm; justify-content: center; page-break-inside: auto;
+            display: flex; flex-wrap: wrap; gap: 2mm; justify-content: flex-start;
           }
-          .a4-cell-label {
-            width: 63.5mm; height: 38.1mm; padding: 2mm 2.5mm; box-sizing: border-box;
-            border: 1px dashed #cbd5e1; page-break-inside: avoid;
-            display: flex; flex-direction: column; justify-content: space-between; overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif; color: #000; background: #fff;
+          .label-page {
+            width: 63.5mm; height: 38.1mm; padding: 2mm; border: 1px dashed #ccc; box-sizing: border-box;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;
+            page-break-inside: avoid;
           }
-          .lbl-header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #000; padding-bottom: 1px; font-size: 7.5pt; font-weight: 900; }
-          .lbl-model-name { font-size: 9.5pt; font-weight: 900; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
-          .lbl-meta-row { display: flex; justify-content: space-between; font-size: 7pt; font-weight: 600; color: #333; }
-          .lbl-barcode-box { display: flex; justify-content: center; align-items: center; margin: 0.5mm 0; width: 100%; }
-          .lbl-barcode-box svg { width: 100%; max-height: 12mm; display: block; }
-          .lbl-footer-row { display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid #000; padding-top: 1.5px; }
-          .lbl-size-badge-modern { display: inline-flex; align-items: baseline; gap: 2px; background: #000; color: #fff; padding: 1.5px 5px; border-radius: 2px; font-weight: 900; }
-          .lbl-size-badge-modern .size-title { font-size: 7pt; font-weight: 700; }
-          .lbl-size-badge-modern .size-number { font-size: 11pt; font-weight: 900; }
-          .lbl-price-modern { font-size: 12pt; font-weight: 900; letter-spacing: -0.3px; }
+          .product-note { font-size: 8px; font-weight: 500; margin-top: 2px; text-transform: none; text-align: center; }
+          .product-name { font-size: 10px; font-weight: 700; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+          .product-meta { font-size: 11px; font-weight: 900; margin-bottom: 2px; }
+          .price { font-size: 12px; font-weight: 900; margin-bottom: 2px; }
+          .barcode-svg { max-width: 100%; height: 10mm; display: block; margin: 0 auto; }
         `;
         break;
-
-      case 'custom':
-        barcodeWidth = customW > 45 ? 1.4 : 1.2;
-        barcodeHeight = Math.max(18, Math.round(customH * 0.75));
-        barcodeFontSize = customW > 45 ? 10 : 8.5;
-        css = `
-          @page { size: ${customW}mm ${customH}mm; margin: 0; }
-          .modern-50x30 {
-            width: ${customW}mm; height: ${customH}mm; padding: 1.5mm 2mm; box-sizing: border-box;
-            page-break-after: always; display: flex; flex-direction: column;
-            justify-content: space-between; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif;
-            color: #000; background: #fff;
-          }
-          .modern-50x30:last-child { page-break-after: auto; }
-          .lbl-header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #000; padding-bottom: 1px; font-size: 7pt; font-weight: 900; }
-          .lbl-model-name { font-size: 9pt; font-weight: 900; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
-          .lbl-meta-row { display: flex; justify-content: space-between; font-size: 6.5pt; font-weight: 600; color: #333; }
-          .lbl-barcode-box { display: flex; justify-content: center; align-items: center; margin: 0.5mm 0; width: 100%; }
-          .lbl-barcode-box svg { width: 100%; max-height: ${Math.max(8, customH - 18)}mm; display: block; }
-          .lbl-footer-row { display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid #000; padding-top: 1.5px; }
-          .lbl-size-badge-modern { display: inline-flex; align-items: baseline; gap: 2px; background: #000; color: #fff; padding: 1px 4px; border-radius: 2px; font-weight: 900; }
-          .lbl-size-badge-modern .size-title { font-size: 6.5pt; font-weight: 700; }
-          .lbl-size-badge-modern .size-number { font-size: 10.5pt; font-weight: 900; }
-          .lbl-price-modern { font-size: 11.5pt; font-weight: 900; letter-spacing: -0.3px; }
-        `;
-        break;
-
       case '50x30':
       default:
-        barcodeWidth = 1.35;
-        barcodeHeight = 27;
-        barcodeFontSize = 10;
+        barcodeHeight = 40;
+        barcodeFontSize = 14;
         css = `
           @page { size: 50mm 30mm; margin: 0; }
-          .modern-50x30 {
-            width: 50mm; height: 30mm; padding: 1.6mm 2mm 1.4mm 2mm; box-sizing: border-box;
+          .label-page {
+            width: 50mm; height: 30mm; padding: 2mm; box-sizing: border-box;
             page-break-after: always; display: flex; flex-direction: column;
-            justify-content: space-between; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-            color: #000; background: #fff;
+            align-items: center; justify-content: center; overflow: hidden;
           }
-          .modern-50x30:last-child { page-break-after: auto; }
-          .lbl-header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #000; padding-bottom: 1px; font-size: 7.2pt; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase; line-height: 1.1; }
-          .lbl-store-name { font-weight: 900; letter-spacing: 0.8px; }
-          .lbl-brand-name { font-weight: 800; }
-          .lbl-model-row { margin-top: 1px; }
-          .lbl-model-name { font-size: 8.8pt; font-weight: 900; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #000; }
-          .lbl-meta-row { display: flex; justify-content: space-between; align-items: center; font-size: 6.5pt; font-weight: 600; color: #333; line-height: 1.1; }
-          .lbl-note-badge { font-style: italic; color: #555; }
-          .lbl-barcode-box { display: flex; justify-content: center; align-items: center; margin: 0.5mm 0; width: 100%; }
-          .lbl-barcode-box svg { width: 100%; max-height: 11.5mm; display: block; }
-          .lbl-footer-row { display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid #000; padding-top: 1.5px; margin-top: auto; }
-          .lbl-size-badge-modern { display: inline-flex; align-items: baseline; gap: 2px; background: #000; color: #fff; padding: 1.2px 4.5px; border-radius: 2px; font-weight: 900; line-height: 1.1; }
-          .lbl-size-badge-modern .size-title { font-size: 6.5pt; font-weight: 700; letter-spacing: 0.4px; }
-          .lbl-size-badge-modern .size-number { font-size: 10.5pt; font-weight: 900; }
-          .lbl-price-modern { font-size: 12pt; font-weight: 900; letter-spacing: -0.4px; line-height: 1; color: #000; }
+          .label-page:last-child { page-break-after: auto; }
+          .product-note { font-size: 8px; font-weight: 500; margin-top: 2px; text-transform: none; text-align: center; }
+          .product-name { font-size: 10px; font-weight: 700; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+          .product-meta { font-size: 11px; font-weight: 900; margin-bottom: 2px; }
+          .price { font-size: 12px; font-weight: 900; margin-bottom: 2px; }
+          .barcode-svg { max-width: 100%; height: 10mm; display: block; margin: 0 auto; }
         `;
         break;
     }
@@ -1273,91 +911,34 @@ const ProductsPage = {
         <head>
           <meta charset="UTF-8">
           <title>Barkod Yazdır - ${esc(product.brand)} ${esc(product.model)}</title>
-          <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"><\/script>
+          <!-- Ana sayfadaki ile ayni surum ve ayni SRI ozeti kullanilir -->
+          <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js" integrity="sha384-Kk5SjBOKprEnGfyBWfD2zROFd1Cu8kwOXxG2GIhYPcoDL2rBJS9P8Ud1ZMy4412a" crossorigin="anonymous" referrerpolicy="no-referrer"><\/script>
           <style>
-            * { box-sizing: border-box; }
             body { 
               margin: 0; padding: 0; box-sizing: border-box;
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-              color: #000; background: #fff;
-              -webkit-print-color-adjust: exact;
-              print-color-adjust: exact;
-            }
-            .barcode-svg, .barcode-svg * {
-              shape-rendering: crispEdges !important;
+              font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+              color: #000; background: #fff; text-align: center;
             }
             ${css}
-            @media screen {
-              body { background: #e2e8f0; padding: 20px 10px; }
-              .screen-print-toolbar {
-                max-width: 680px; margin: 0 auto 20px auto;
-                background: #1e293b; color: #f8fafc;
-                padding: 12px 18px; border-radius: 10px;
-                display: flex; justify-content: space-between; align-items: center;
-                box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-              }
-              .label-page {
-                box-shadow: 0 4px 15px rgba(0,0,0,0.18);
-                margin: 12px auto;
-                border-radius: 4px;
-                outline: 1px dashed #cbd5e1;
-              }
-            }
-            @media print {
-              .no-print { display: none !important; }
-              body { background: #fff !important; }
-              .label-page { outline: none !important; box-shadow: none !important; }
-            }
           </style>
         </head>
         <body>
-          <div class="screen-print-toolbar no-print">
-            <div>
-              <div style="font-weight:700;font-size:0.95rem;">🏷️ ${totalLabelCount} Adet Etiket Baskıya Hazır</div>
-              <div style="font-size:0.75rem;color:#94a3b8;margin-top:2px;">
-                💡 Net sonuç için yazdırma ayarlarında <strong>"Kenar Boşlukları (Margins)"</strong> seçeneğini <strong>"Yok / None"</strong> yapın.
-              </div>
-            </div>
-            <div style="display:flex;gap:8px;">
-              <button onclick="window.print()" style="background:#06b6d4;color:#000;border:none;padding:8px 16px;border-radius:6px;font-weight:700;cursor:pointer;">🖨️ Yazdır</button>
-              <button onclick="window.close()" style="background:transparent;color:#94a3b8;border:1px solid #475569;padding:8px 12px;border-radius:6px;cursor:pointer;">✕ Kapat</button>
-            </div>
-          </div>
-
           ${labelsHTML}
           
           <script>
             window.onload = function() {
-              if (typeof JsBarcode === 'undefined' && window.opener && window.opener.JsBarcode) {
-                window.JsBarcode = window.opener.JsBarcode;
-              }
-
-              const cleanCode = ${escJs(product.barcode.toString().trim())};
-              const isEan13 = /^\\d{13}$/.test(cleanCode);
-              const barcodeOpts = {
-                format: isEan13 ? "EAN13" : "CODE128",
-                width: ${barcodeWidth},
-                height: ${barcodeHeight},
-                displayValue: true,
-                fontSize: ${barcodeFontSize},
-                font: "monospace",
-                fontOptions: "bold",
-                textMargin: 1,
-                margin: 0
-              };
-
+              const opts = { format: "EAN13", width: 1.5, height: ${barcodeHeight}, displayValue: true, fontSize: ${barcodeFontSize} };
               try {
-                JsBarcode(".barcode-svg", cleanCode, barcodeOpts);
+                JsBarcode(".barcode-svg", ${escJs(product.barcode)}, opts);
               } catch(e) {
-                barcodeOpts.format = "CODE128";
-                try {
-                  JsBarcode(".barcode-svg", cleanCode, barcodeOpts);
-                } catch(err) {}
+                opts.format = "CODE128";
+                JsBarcode(".barcode-svg", ${escJs(product.barcode)}, opts);
               }
               
               setTimeout(() => {
                 window.print();
-              }, 400);
+                window.close();
+              }, 500);
             };
           <\/script>
         </body>
